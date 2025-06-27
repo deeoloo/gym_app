@@ -1,0 +1,1 @@
+export const API_BASE_URL = "https://json-mock-api-vk2o.onrender.com/api";
