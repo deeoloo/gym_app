@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token, decode_token
 from models.user import User
+from werkzeug.exceptions import Unauthorized
 from app import db
 
 auth_bp = Blueprint('auth', __name__)
@@ -30,9 +31,11 @@ def register():
         db.session.commit()
 
         access_token = create_access_token(identity=user.id)
+        refresh_token =create_refresh_token(identity=user.id)
         return jsonify({
             'message': 'Registration successful',
             'access_token': access_token,
+            'refresh_token':refresh_token,
             'user': user.to_dict()
         }), 201
     except Exception as e:
@@ -50,8 +53,27 @@ def login():
         return jsonify({'message': 'Invalid credentials'}), 401
 
     access_token = create_access_token(identity=user.id)
+    refresh_token =create_refresh_token(identity=user.id)
     return jsonify({
         'message': 'Login successful',
         'access_token': access_token,
+        'refresh_token':refresh_token,
         'user': user.to_dict()
     }), 200
+
+@auth_bp.route('/refresh', methods=['POST'])
+def refresh():
+    data = request.get_json()
+    refresh_token = data.get('refresh_token')
+
+    if not refresh_token:
+        raise Unauthorized('Missing refresh token')
+
+    try:
+        decoded = decode_token(refresh_token)
+        identity = decoded['sub']
+    except Exception as e:
+        return jsonify({'msg': 'Invalid or expired refresh token'}), 401
+
+    new_access_token = create_access_token(identity=identity)
+    return jsonify(access_token=new_access_token)

@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 fake = Faker()
 app = create_app()
 
-def seed_users(num_users=20):
+def seed_users(num_users=5):
     """Seed users with random data"""
     print("Seeding users...")
 
@@ -49,7 +49,7 @@ def seed_users(num_users=20):
     return users
 
 
-def seed_workouts(users, num_workouts=100):
+def seed_workouts(users, num_workouts=8):
     """Seed workouts for users"""
     print("Seeding workouts...")
     workout_types = [

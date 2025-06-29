@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import ProfileSection from '../components/Profile/ProfileSection';
 import { useAppContext } from '../contexts/AppContext';
-// Import your custom CSS
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,11 +11,11 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>👋 Welcome Back!</h1>
+        <h1>Welcome!</h1>
       </div>
 
       <section className="dashboard-section">
-        <h2 className="dashboard-title">🎯 My Profile</h2>
+        <h2 className="dashboard-title">Profile</h2>
         {loadingProfile ? (
           <p className="loading-text">Loading profile...</p>
         ) : (

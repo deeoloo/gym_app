@@ -38,7 +38,7 @@ def manage_friend(friend_id):
     if request.method == 'POST':
         try:
             user.send_friend_request(friend)
-            return jsonify({'message': 'Friend request sent'}), 200
+            return jsonify(message ='Friend request sent', friend=friend.to_dict()), 200
         except ValueError as e:
             return jsonify({'message': str(e)}), 400
     

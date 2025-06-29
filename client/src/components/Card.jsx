@@ -63,7 +63,7 @@ const Card = ({ type, data, isCompleted = false, onAction = () => {} }) => {
 
   const renderProductCard = ({ data, onAction, isCompleted }) => (
     <div className="section-wrapper">
-      {data.image ? (
+      {data.image_url ? (
         <img
           src={data.image}
           alt={data.name}

@@ -1,11 +1,15 @@
 // Login.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAppContext } from '../contexts/AppContext';
+
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { setToken, setUser } = useAppContext();
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -32,8 +36,12 @@ const Login = () => {
       if (!res.ok) throw new Error(data.message || 'Login failed');
 
       localStorage.setItem('token', data.access_token);
+      localStorage.setItem('refresh_token', data.refresh_token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      setToken(data.access_token);   // ✅ updates React state
+      setUser(data.user);            // ✅ updates React state
       navigate('/dashboard');
+
     } catch (err) {
       setError(err.message);
     }

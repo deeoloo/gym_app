@@ -22,6 +22,128 @@ body {
   margin-bottom: 2rem;
 }
 
+/* Auth.css */
+.auth-layout {
+  min-height: 100vh;
+  background-color: #f5f5dc; /* Beige background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-form {
+  background-color: white; /* White form */
+  padding: 30px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #d2b48c; /* Darker beige for buttons */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.error {
+  color: #ff3333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.text-center {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.auth-link {
+  color: #d2b48c; /* Darker beige for links */
+  text-decoration: none;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-input {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #b8a28a; /* Light beige-brown */
+  box-shadow: 0 0 0 2px rgba(184, 162, 138, 0.2);
+}
+
+textarea.form-input {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-button {
+  background-color: #b8a28a; /* Light beige-brown */
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-button:hover {
+  background-color: #9c8c7a; /* Darker shade */
+}
+
+.error-message, .error {
+  color: #d32f2f; /* Red for errors */
+  background-color: #ffebee;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.text-center {
+  text-align: center;
+  margin-top: 15px;
+  color: #5a4a42;
+}
+
+.auth-link {
+  color: #b8a28a;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+  color: #9c8c7a;
+  text-decoration: underline;
+}
+
 .login-button {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;

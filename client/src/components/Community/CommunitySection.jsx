@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 
 
+
 const CommunitySection = () => {
   const { profileData, setProfileData, token, user} = useAppContext();
   const [postContent, setPostContent] = useState('');
@@ -72,6 +73,10 @@ const CommunitySection = () => {
       .then(res => res.json())
       .then(data => {
         showCommunityMessage(data.message || `Friend request sent to ${friendName}`);
+        setProfileData(prev => ({
+          ...prev,
+          friends: data.friends || []
+        }));
         setSuggestions(prev => prev.filter(f => f.id !== friendId));
       })
       .catch(err => console.error("Failed to send friend request:", err));
@@ -164,20 +169,26 @@ const CommunitySection = () => {
       return;
     }
 
-
     fetch('http://localhost:5000/api/friends', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
-    .then(res => res.json())
-    .then(data => setFriends(data.friends || []))
-    .catch(err => {
-      console.error("Failed to fetch friends:", err);
-      setFriends([]);
-    });
-  }, [token]);  
+      .then(res => res.json())
+      .then(data => {
+        setFriends(data.friends || []);
+        setProfileData(prev => ({
+          ...prev,
+          friends: data.friends || []
+      }));
+      })
+      .catch(err => {
+        console.error("Failed to fetch friends:", err);
+        setFriends([]);
+      });
+  }, [token]);
+  
 
 
 

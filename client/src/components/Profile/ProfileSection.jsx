@@ -48,7 +48,7 @@ const ProfileSection = () => {
           <h3 className="section-subtitle">Recent Activity</h3>
           <div className="activity-list">
             {[
-              ...profileData.completedWorkoutDetails.slice(-3).map(workout => ({
+              ...profileData.completedWorkoutDetails.slice(-1).map(workout => ({
                 type: 'workout',
                 text: `Completed ${workout.name}`,
                 icon: '🏋️',
@@ -74,7 +74,15 @@ const ProfileSection = () => {
                 text: `Posted: "${post.content.substring(0, 20)}..."`,
                 icon: '💬',
                 date: post.time
+              })),
+
+              ...profileData.friends.slice(-1).map(friend => ({
+                type: 'friends',
+                text: `Became friends with ${friend.username}`,
+                icon: '🧑‍🤝‍🧑',
+                date: friend.created_at || new Date().toISOString()
               }))
+
             ]
               .sort((a, b) => new Date(b.date) - new Date(a.date))
               .map((activity, index) => (
@@ -93,13 +101,13 @@ const ProfileSection = () => {
           <h3 className="section-subtitle">Achievements</h3>
           <div className="achievements-grid">
             <div className={`achievement-card ${profileData.completedWorkouts.length >= 5 ? 'completed' : ''}`}>
-              <div className="achievement-title">5 Workouts</div>
+              <div className="achievement-title">Workouts</div>
               <div className="achievement-status">
                 {profileData.completedWorkouts.length >= 5 ? 'Completed!' : `${5 - profileData.completedWorkouts.length} to go`}
               </div>
             </div>
             <div className={`achievement-card ${profileData.communityChallenges.length >= 1 ? 'completed' : ''}`}>
-              <div className="achievement-title">1 Challenge</div>
+              <div className="achievement-title"> Challenge</div>
               <div className="achievement-status">
                 {profileData.communityChallenges.length >= 1 ? 'Completed!' : 'Not started'}
               </div>

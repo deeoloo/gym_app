@@ -2,9 +2,12 @@ import useApi from '../../hooks/useApi';
 import React, { useState } from 'react';
 import Card from '../Card';
 import LoadingSpinner from '../LoadingSpinner';
+import { useAppContext } from '../../contexts/AppContext';
+
 
 const NutritionSection = () => {
   const { data, loading, error } = useApi('/api/nutrition');
+  const { profileData, savedRecipe } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
 
   if (loading) return <LoadingSpinner />;
@@ -35,6 +38,8 @@ const NutritionSection = () => {
               key={plan.id}
               type="nutrition"
               data={plan}
+              isCompleted={profileData.savedRecipes.some(r => r.id === plan.id)}
+              onAction={() => savedRecipe(plan)}
             />
           ))
         ) : (
