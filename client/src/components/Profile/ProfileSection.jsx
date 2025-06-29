@@ -3,16 +3,12 @@ import { useAppContext } from '../../contexts/AppContext';
 
 const ProfileSection = () => {
   const { profileData } = useAppContext();
-  const navigate = useNavigate();
+  const user = {
+    username: profileData.username,
+    email: profileData.email,
+    avatar: profileData.avatar || '👤',
+  };
 
-  const user = JSON.parse(localStorage.getItem('user')) || {};
-  const token = localStorage.getItem('token');
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem('user');
-  //   localStorage.removeItem('token');
-  //   navigate('/');
-  // };
 
   return (
     <section className="profile-section">
@@ -20,16 +16,13 @@ const ProfileSection = () => {
         <div className="profile-header">
           <div className="flex items-center">
             <div className="profile-avatar">
-              {user?.name?.charAt(0) || 'U'}
+              {user.avatar}
             </div>
             <div>
-              <h2 className="profile-name">{user?.name || 'User'}</h2>
+              <h2 className="profile-name">{user?.username || 'User'}</h2>
               <p className="profile-email">{user?.email || ''}</p>
             </div>
           </div>
-          {/* <button onClick={handleLogout} className="btn btn-danger">
-            Logout
-          </button> */}
         </div>
 
         <div className="profile-stats">
@@ -45,6 +38,10 @@ const ProfileSection = () => {
             <div className="stat-value">{profileData.friends.length}</div>
             <div className="stat-label">Friends</div>
           </div>
+          <div className="stat-card">
+            <div className="stat-value">{profileData.savedRecipes.length}</div>
+            <div className="stat-label">Nutrition</div>
+          </div>
         </div>
 
         <div className="activity">
@@ -59,10 +56,19 @@ const ProfileSection = () => {
               })),
               ...profileData.communityChallenges.slice(-1).map(challenge => ({
                 type: 'challenge',
-                text: `Joined ${challenge}`,
+                text: `Joined ${challenge.name}`,
                 icon: '🏆',
-                date: new Date().toLocaleDateString()
+                date: challenge.joined_at || new Date().toISOString()
               })),
+
+              ...profileData.savedRecipes.slice(-1).map(nutrition => ({
+              type: 'nutrition',
+              text: `Saved ${nutrition.name}`,
+              icon: '🥗',
+              date: nutrition.date
+              })),
+
+
               ...profileData.posts.slice(-1).map(post => ({
                 type: 'post',
                 text: `Posted: "${post.content.substring(0, 20)}..."`,

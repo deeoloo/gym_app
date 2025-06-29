@@ -1,4 +1,3 @@
-// contexts/AppContext.jsx
 import { createContext, useContext, useEffect, useState } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 
@@ -6,27 +5,50 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [cart, setCart] = useLocalStorage('cart', []);
-  const [profileData, setProfileData] = useLocalStorage('profile', {
+  const [profileData, setProfileData] = useState({
     completedWorkouts: [],
     completedWorkoutDetails: [],
     communityChallenges: [],
     friends: [],
     posts: [],
+    savedRecipes: [],
+  });
+
+  const getValidToken = () => {
+    const stored = localStorage.getItem('token');
+    return stored && stored !== 'null' && stored.split('.').length === 3 ? stored : '';
+  };
+
+  const [token, setToken] = useState(getValidToken);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser && storedUser !== 'null' ? JSON.parse(storedUser) : null;
   });
 
   const [loadingProfile, setLoadingProfile] = useState(true);
 
+  const logout = () => {
+    setUser(null);
+    setToken('');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  };
+
+  // Fetch profile if token is valid
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token || token.split('.').length !== 3) {
+      setLoadingProfile(false);
+      return;
+    }
 
     fetch('http://localhost:5000/api/profile', {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
     })
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch profile');
+        if (!res.ok) throw new Error('Invalid or expired token');
         return res.json();
       })
       .then(data => {
@@ -35,43 +57,35 @@ export const AppProvider = ({ children }) => {
       })
       .catch(err => {
         console.error('Error loading profile:', err);
+        logout();
         setLoadingProfile(false);
       });
-  }, []);
+  }, [token]);
 
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
+  // Cart helpers
+  const addToCart = (product) => setCart([...cart, product]);
+  const removeFromCart = () => setCart([]);
 
-  const removeFromCart = () => {
-    setCart([]);
-  };
-
+  // Profile data helpers
   const completeWorkout = (workout) => {
     if (!profileData.completedWorkouts.includes(workout.id)) {
-      const updatedProfile = {
-        ...profileData,
-        completedWorkouts: [...profileData.completedWorkouts, workout.id],
+      setProfileData(prev => ({
+        ...prev,
+        completedWorkouts: [...prev.completedWorkouts, workout.id],
         completedWorkoutDetails: [
-          ...profileData.completedWorkoutDetails,
-          {
-            id: workout.id,
-            name: workout.name,
-            date: new Date().toISOString(),
-          }
+          ...prev.completedWorkoutDetails,
+          { id: workout.id, name: workout.name, date: new Date().toISOString() }
         ]
-      };
-      setProfileData(updatedProfile);
+      }));
     }
   };
 
   const joinChallenge = (challenge) => {
-    if (!profileData.communityChallenges.includes(challenge)) {
-      const updatedProfile = {
-        ...profileData,
-        communityChallenges: [...profileData.communityChallenges, challenge]
-      };
-      setProfileData(updatedProfile);
+    if (!profileData.communityChallenges.some(c => c.id === challenge.id)) {
+      setProfileData(prev => ({
+        ...prev,
+        communityChallenges: [...prev.communityChallenges, challenge]
+      }));
     }
   };
 
@@ -84,21 +98,50 @@ export const AppProvider = ({ children }) => {
       comments: 0,
       time: new Date().toISOString(),
     };
-    const updatedProfile = {
-      ...profileData,
-      posts: [newPost, ...profileData.posts]
-    };
-    setProfileData(updatedProfile);
+    setProfileData(prev => ({
+      ...prev,
+      posts: [newPost, ...prev.posts]
+    }));
   };
 
   const addFriend = (friendName) => {
     if (!profileData.friends.includes(friendName)) {
-      const updatedProfile = {
-        ...profileData,
-        friends: [...profileData.friends, friendName]
-      };
-      setProfileData(updatedProfile);
+      setProfileData(prev => ({
+        ...prev,
+        friends: [...prev.friends, friendName]
+      }));
     }
+  };
+
+  const saveRecipe = (recipe) => {
+    fetch(`http://localhost:5000/api/nutrition/${recipe.id}/save`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Save failed");
+        return res.json();
+      })
+      .then(() => {
+        setProfileData(prev => ({
+          ...prev,
+          savedRecipes: [
+            ...prev.savedRecipes,
+            {
+              id: recipe.id,
+              name: recipe.name,
+              date: new Date().toISOString()
+            }
+          ]
+        }));
+      })
+      .catch(err => {
+        console.error("Error saving recipe:", err);
+        if (err.message.includes('token')) logout();
+      });
   };
 
   return (
@@ -114,7 +157,12 @@ export const AppProvider = ({ children }) => {
         joinChallenge,
         addPost,
         addFriend,
-        loadingProfile
+        loadingProfile,
+        user,
+        setUser,
+        token,
+        setToken,
+        saveRecipe
       }}
     >
       {children}

@@ -4,7 +4,6 @@ const useApi = (url, options = {}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,13 +13,10 @@ const useApi = (url, options = {}) => {
           ...options.headers,
         };
 
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-
         const response = await fetch(url, {
           ...options,
           headers,
+          credentials: 'include', 
         });
 
         if (!response.ok) {
@@ -38,7 +34,7 @@ const useApi = (url, options = {}) => {
     };
 
     fetchData();
-  }, [url, token, JSON.stringify(options)]); // use JSON.stringify to avoid infinite loops
+  }, [url, JSON.stringify(options)]); 
 
   return { data, loading, error };
 };

@@ -5,7 +5,6 @@ from app import db
 
 user_bp = Blueprint('users', __name__)
 
-# ✅ Friend suggestion endpoint wrapped in `data.users`
 @user_bp.route('/users/suggestions', methods=['GET'])
 @jwt_required()
 def suggest_friends():
@@ -15,16 +14,21 @@ def suggest_friends():
     if not current_user:
         return jsonify({'message': 'User not found'}), 404
 
-    # Get all user IDs already connected to the current user
-    subquery = db.session.query(user_friends.c.friend_id).filter(user_friends.c.user_id == current_user_id)
-    reverse_subquery = db.session.query(user_friends.c.user_id).filter(user_friends.c.friend_id == current_user_id)
-    connected_ids = set([r[0] for r in subquery.union(reverse_subquery)])
+    # Get only accepted friends
+    accepted_subquery = db.session.query(user_friends.c.friend_id).filter(
+        user_friends.c.user_id == current_user_id,
+        user_friends.c.status == 'accepted'
+    ).union(
+        db.session.query(user_friends.c.user_id).filter(
+            user_friends.c.friend_id == current_user_id,
+            user_friends.c.status == 'accepted'
+        )
+    )
 
-    # Add self to the exclusion list
-    connected_ids.add(current_user_id)
+    accepted_ids = set([r[0] for r in accepted_subquery])
+    accepted_ids.add(current_user_id)
 
-    # Suggest users who are not already connected
-    suggestions = User.query.filter(~User.id.in_(connected_ids)).limit(10).all()
+    suggestions = User.query.filter(~User.id.in_(accepted_ids)).limit(10).all()
 
     result = [{
         'id': u.id,
@@ -37,6 +41,7 @@ def suggest_friends():
     } for u in suggestions]
 
     return jsonify({'data': {'users': result}}), 200
+
 
 # (Optional) Get all users - useful for admin/testing
 @user_bp.route('/users', methods=['GET'])

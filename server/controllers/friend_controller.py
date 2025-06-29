@@ -11,7 +11,8 @@ def get_friends():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
     friends = user.get_friends()
-    return jsonify([friend.to_dict() for friend in friends]), 200
+    return jsonify({"friends": [friend.to_dict() for friend in friends]}), 200
+
 
 @friend_bp.route('/requests', methods=['GET'])
 @jwt_required()

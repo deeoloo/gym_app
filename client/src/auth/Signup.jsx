@@ -1,3 +1,4 @@
+// Signup.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -14,9 +15,7 @@ const Signup = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/dashboard');
-    }
+    if (token) navigate('/dashboard');
   }, []);
 
   const handleChange = (e) => {

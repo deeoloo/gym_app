@@ -14,16 +14,19 @@ bcrypt = Bcrypt()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    app.url_map.strict_slashes = False
 
-    # Configure CORS with settings from Config
-    CORS(app, resources={
+    CORS(app,
+    resources={
         r"/api/*": {
-            "origins": app.config['CORS_ORIGINS'],
+            "origins": "http://localhost:5173",
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
+            "allow_headers": ["Content-Type", "Authorization"]
         }
-    })
+    },
+    supports_credentials=True
+)
+
     
     db.init_app(app)
     migrate.init_app(app, db)
@@ -57,3 +60,7 @@ def create_app(config_class=Config):
     app.register_blueprint(product_controller.product_bp, url_prefix='/api/products')
     
     return app
+
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True)

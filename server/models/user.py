@@ -12,6 +12,14 @@ user_friends = db.Table('user_friends',
     db.Column('status', db.String(20), default='pending')  # 'pending', 'accepted', 'rejected'
 )
 
+
+#Association table
+saved_recipes_table = db.Table(
+    'saved_recipes',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('nutrition_id', db.Integer, db.ForeignKey('nutrition_plans.id'))
+)
+
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
@@ -44,6 +52,14 @@ class User(db.Model, SerializerMixin):
         backref=db.backref('friend_of', lazy='dynamic'),
         lazy='dynamic'
     )
+
+    saved_recipes = db.relationship(
+    'NutritionPlan',
+    secondary=saved_recipes_table,
+    backref='saved_by_users',
+    lazy='dynamic'
+    )
+
     
     # Serialization rules
     serialize_rules = (

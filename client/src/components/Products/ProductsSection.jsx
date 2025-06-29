@@ -31,15 +31,14 @@ const ProductsSection = () => {
       </div>
 
       {cart.length > 0 && (
-        <div className="flex justify-end">
-          <button
-            onClick={removeFromCart}
-            className="btn btn-danger"
-          >
-            Clear Cart
-          </button>
+        <div className="cart-summary">
+          <p>{cart.length} item(s) in cart</p>
+            <button onClick={removeFromCart} className="btn btn-danger">
+              Clear Cart
+            </button>
         </div>
       )}
+
     </section>
   );
 };

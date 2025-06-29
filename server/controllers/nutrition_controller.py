@@ -136,6 +136,24 @@ def get_nutrition_plan(plan_id):
         }), 200
     except Exception as e:
         return jsonify({'message': f"Error fetching nutrition plan: {str(e)}"}), 500
+    
+
+@nutrition_bp.route('/<int:recipe_id>/save', methods=['POST'])
+@jwt_required()
+def save_recipe(recipe_id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    recipe = NutritionPlan.query.get(recipe_id)
+
+    if not recipe:
+        return jsonify({'message': 'Recipe not found'}), 404
+
+    if recipe not in user.saved_recipes:
+        user.saved_recipes.append(recipe)
+        db.session.commit()
+
+    return jsonify({'message': 'Recipe saved successfully'}), 200
+
 
 # Update nutrition plan (owner only)
 @nutrition_bp.route('/<int:plan_id>', methods=['PUT'])

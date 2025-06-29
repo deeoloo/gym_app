@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 
+
 const CommunitySection = () => {
-  const { profileData } = useAppContext();
+  const { profileData, setProfileData, token, user} = useAppContext();
   const [postContent, setPostContent] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showMessage, setShowMessage] = useState(false);
@@ -12,8 +13,7 @@ const CommunitySection = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [friends, setFriends] = useState([]);
 
-
-  const token = localStorage.getItem('token');
+  
 
   const showCommunityMessage = (msg) => {
     setMessage(msg);
@@ -24,12 +24,12 @@ const CommunitySection = () => {
   const handlePostSubmit = () => {
     if (!postContent.trim()) return;
 
-    fetch('/api/posts', {
+    fetch('http://localhost:5000/api/posts', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
       body: JSON.stringify({ content: postContent })
     })
       .then(res => res.json())
@@ -41,28 +41,33 @@ const CommunitySection = () => {
       .catch(err => console.error("Post failed:", err));
   };
 
-  const handleJoinChallenge = (challengeName) => {
-    const challenge = challenges.find(c => c.name === challengeName);
-    if (!challenge) return;
-
-    fetch(`/api/challenges/${challenge.id}/join`, {
+  const handleJoinChallenge = (challengeId) => {
+    fetch(`http://localhost:5000/api/challenges/${challengeId}/join`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
     })
       .then(res => res.json())
       .then(data => {
         showCommunityMessage(`Joined ${data.challenge.name}`);
+        setProfileData(prev => ({
+          ...prev,
+            communityChallenges: [...prev.communityChallenges, data.challenge]
+        }));
+
       });
   };
 
+
   const handleAddFriend = (friendId, friendName) => {
-    fetch(`/api/friends/${friendId}`, {
+    fetch(`http://localhost:5000/api/friends/${friendId}`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
     })
       .then(res => res.json())
       .then(data => {
@@ -73,11 +78,12 @@ const CommunitySection = () => {
   };
 
   const handleRemoveFriend = (friendId) => {
-    fetch(`/api/friends/${friendId}`, {
+    fetch(`http://localhost:5000/api/friends/${friendId}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
     })
       .then(res => res.json())
       .then(data => {
@@ -87,55 +93,92 @@ const CommunitySection = () => {
       .catch(err => console.error("Failed to remove friend:", err));
   };
  
-
   useEffect(() => {
-    fetch('/api/challenges')
-      .then(res => res.json())
-      .then(setChallenges);
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/posts')
-      .then(res => res.json())
-      . then(data => setPosts(data.posts || []))  // defensive access
-      .catch(err => {
-        console.error("Error loading posts:", err);
-      setPosts([]);  // fallback
-      }); 
-  }, []);
+    if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
+      console.warn('🚫 Skipping fetch: invalid or missing token:', token);
+      return;
+    }
 
 
-  useEffect(() => {
-    fetch('/api/users/suggestions', {
+    fetch('http://localhost:5000/api/challenges', {
       headers: {
-        Authorization: `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
     })
       .then(res => res.json())
-      .then(data => {
-        console.log("Suggestions response:", data); // DEBUG LINE
-        setSuggestions(Array.isArray(data) ? data : []); // ✅ Defensive fix
-      })
-      .catch(err => {
-        console.error("Failed to fetch suggestions:", err);
-        setSuggestions([]); // Fallback to prevent filter error
-      });
-  }, []);
+      .then(setChallenges);
+  }, [token]);  // ✅ stable dependency array
 
+
+  useEffect(() => {
+    if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
+      console.warn('🚫 Skipping fetch: invalid or missing token:', token);
+      return;
+    }
+
+    fetch('http://localhost:5000/api/posts', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(data => setPosts(data.posts || []))
+      .catch(err => {
+        console.error("Error loading posts:", err);
+        setPosts([]);
+    });
+  }, [token]);  // ✅ stable dependency array
 
 
 
   useEffect(() => {
-    fetch('/api/friends', {
-      headers: { Authorization: `Bearer ${token}` }
+    if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
+      console.warn('🚫 Skipping fetch: invalid or missing token:', token);
+      return;
+    }
+ 
+
+    fetch('http://localhost:5000/api/users/suggestions', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     })
-      .then(res => res.json())
-      .then(data => setFriends(data.friends || []))  // Expecting `friends` key
-      .catch(err => {
-        console.error("Failed to fetch friends:", err);
-        setFriends([]);  // fallback to empty array
-      });
-  }, []);
+    .then(res => res.json())
+    .then(data => {
+      console.log("Suggestions response:", data);
+      setSuggestions(data?.data?.users || []);
+    })
+    .catch(err => {
+      console.error("Failed to fetch suggestions:", err);
+      setSuggestions([]);
+    });
+  }, [token]);  
+
+
+  useEffect(() => {
+    if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
+      console.warn('🚫 Skipping fetch: invalid or missing token:', token);
+      return;
+    }
+
+
+    fetch('http://localhost:5000/api/friends', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(res => res.json())
+    .then(data => setFriends(data.friends || []))
+    .catch(err => {
+      console.error("Failed to fetch friends:", err);
+      setFriends([]);
+    });
+  }, [token]);  
+
 
 
 
@@ -185,13 +228,14 @@ const CommunitySection = () => {
         )}
 
                       <button
-                          onClick={() => handleJoinChallenge(challenge.name)}
-                        className={`challenge-button ${profileData.communityChallenges.includes(challenge.name) ? 'joined' : ''}`}
+                        onClick={() => handleJoinChallenge(challenge.id)}
+                          className={`challenge-button ${profileData.communityChallenges.some(c => c.id === challenge.id) ? 'joined' : ''}`}
                       >
-                    {profileData.communityChallenges.includes(challenge.name)
-                      ? "Joined ✓"
-                    : "Join Challenge"}
-                  </button>
+                        {profileData.communityChallenges.some(c => c.id === challenge.id)
+                          ? "Joined ✓"
+                          : "Join Challenge"}
+                      </button>
+
                   </div>
                 ))
               )}
@@ -203,28 +247,33 @@ const CommunitySection = () => {
             <h3 className="section-subtitle">Community Feed</h3>
             
             <div className="posts-list">
-              {posts.map((post, index) => (
-                <div key={index} className="post-card">
-                  <div className="post-header">
-                    <span className="post-avatar">{post.user.avatar}</span>
-                    <span className="post-user">{post.user.username}</span>
-                    <span className="post-time">{new Date(post.created_at).toLocaleString()}</span>
-                  </div>
-                <div className="post-content"><p>{post.content}</p></div>
-                  <div className="post-actions">
-                    <button className="post-action">
-                      <span>👍</span> {post.likes}
-                    </button>
-                    <button className="post-action">
-                      <span>💬</span> {post.comments}
-                    </button>
-                    <button className="post-action">
-                      <span>↗️</span> Share
-                    </button>
-                  </div>
-                </div>
-              ))}
+              {posts.map((post, index) => {
+                if (!post || !post.user) return null; // 🛡️ Skip undefined or malformed posts
 
+                return (
+                  <div key={index} className="post-card">
+                    <div className="post-header">
+                      <span className="post-avatar">{post.user.avatar || '👤'}</span>
+                      <span className="post-user">{post.user.username || 'Unknown'}</span>
+                      <span className="post-time">{new Date(post.created_at).toLocaleString()}</span>
+                    </div>
+                    <div className="post-content">
+                      <p>{post.content}</p>
+                    </div>
+                    <div className="post-actions">
+                      <button className="post-action">
+                        <span>👍</span> {post.likes}
+                      </button>
+                      <button className="post-action">
+                        <span>💬</span> {post.comments}
+                      </button>
+                      <button className="post-action">
+                        <span>↗️</span> Share
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             
             <div className="create-post">

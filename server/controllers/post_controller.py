@@ -5,6 +5,7 @@ from app import db
 from models.user import User
 from datetime import datetime
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 post_bp = Blueprint('posts', __name__)
 
@@ -71,20 +72,11 @@ def create_post():
         db.session.add(post)
         db.session.commit()
         
-        user = User.query.get(current_user_id)
+        post = Post.query.options(joinedload(Post.user)).get(post.id)
+
         return jsonify({
             'message': 'Post created successfully',
-            'post': {
-                'id': post.id,
-                'content': post.content,
-                'likes': post.likes,
-                'created_at': post.created_at.isoformat(),
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'avatar': user.avatar
-                }
-            }
+            'post': post.to_dict()
         }), 201
     except Exception as e:
         db.session.rollback()
