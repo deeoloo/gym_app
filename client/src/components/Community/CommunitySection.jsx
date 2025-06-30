@@ -189,11 +189,6 @@ const CommunitySection = () => {
       });
   }, [token]);
   
-
-
-
-
-
    return (
     <section className="community-section">
       {showMessage && (

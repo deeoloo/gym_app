@@ -1,42 +1,46 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const useApi = (url, options = {}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const headers = {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        };
+  const fetchApi = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-        const response = await fetch(url, {
-          ...options,
-          headers,
-          credentials: 'include', 
-        });
+    try {
+      const token = localStorage.getItem('token'); // or useContext(AppContext) if needed
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers,
+      };
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-        }
+      const response = await fetch(url.startsWith('http') ? url : `http://localhost:5000${url}`, {
+        ...options,
+        headers,
+      });
 
-        const json = await response.json();
-        setData(json);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
-    };
 
-    fetchData();
-  }, [url, JSON.stringify(options)]); 
+      const json = await response.json();
+      setData(json);
+    } catch (err) {
+      setError(err.message || 'Error fetching data');
+    } finally {
+      setLoading(false);
+    }
+  }, [url, JSON.stringify(options)]);
 
-  return { data, loading, error };
+  useEffect(() => {
+    fetchApi();
+  }, [fetchApi]);
+
+  return { data, loading, error, refetch: fetchApi };
 };
 
 export default useApi;

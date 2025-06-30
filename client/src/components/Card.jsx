@@ -34,6 +34,16 @@ const Card = ({ type, data, isCompleted = false, onAction = () => {} }) => {
           >
             {isCompleted ? 'Completed ✓' : 'Mark Complete'}
           </button>
+
+          {onDelete && (
+          <button
+            onClick={() => onDelete(data.id)}
+            className="delete-button"
+          >
+            Delete Workout
+          </button>
+          )}
+
         </div>
       </div>
     );
@@ -57,6 +67,14 @@ const Card = ({ type, data, isCompleted = false, onAction = () => {} }) => {
         >
           {isCompleted ? 'Saved ✓' : 'Save Recipe'}
         </button>
+        {onDelete && (
+        <button
+          onClick={() => onDelete(data.id)}
+          className="delete-button"
+        >
+          Delete Nutrition
+        </button>
+        )}
       </div>
     </div>
   );

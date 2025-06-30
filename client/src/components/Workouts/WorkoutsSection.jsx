@@ -3,10 +3,11 @@ import useApi from '../../hooks/useApi';
 import { useAppContext } from '../../contexts/AppContext';
 import Card from '../Card';
 import LoadingSpinner from '../LoadingSpinner';
+import WorkoutForm from './WorkoutForm';
 
 
 const WorkoutsSection = () => {
-  const { data, loading, error } = useApi('/api/workouts');
+  const { data, loading, error, refetch } = useApi('/api/workouts');
   const { profileData, completeWorkout } = useAppContext();
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,6 +27,9 @@ const WorkoutsSection = () => {
   return (
     <section className="workouts-section">
       <h2 className="section-title">Workouts</h2>
+
+      {/* Workout Form */}
+      <WorkoutForm onCreated={refetch} />
       
       {/* Search Bar */}
       <div className="search-container">
@@ -57,6 +61,7 @@ const WorkoutsSection = () => {
             data={workout}
             isCompleted={profileData.completedWorkouts.includes(workout.id)}
             onAction={() => completeWorkout(workout)}
+            onDelete={handleDeleteWorkout}
           />
         ))}
       </div>

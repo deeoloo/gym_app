@@ -153,8 +153,41 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const handleDeleteWorkout = async (id) => {
+  if (!window.confirm('Delete this workout?')) return;
+  try {
+    const res = await fetch(`/api/workouts/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (res.ok) refetch();
+    else alert('Failed to delete');
+  } catch {
+    alert('Error deleting workout');
+  }
+};
+
+const handleDeleteNutrition = async (id) => {
+  if (!window.confirm('Delete this nutrition plan?')) return;
+  try {
+    const res = await fetch(`/api/nutrition/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (res.ok) refetch();
+    else alert('Failed to delete');
+  } catch {
+    alert('Error deleting nutrition');
+  }
+};
+
+
   const savedRecipe = (recipe) => {
-    fetch(`http://localhost:5000/api/nutrition/${recipe.id}/save`, {
+    fetch(`/api/nutrition/${recipe.id}/save`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -203,6 +236,8 @@ export const AppProvider = ({ children }) => {
         token,
         setToken,
         savedRecipe,
+        handleDeleteWorkout,
+        handleDeleteNutrition,
       }}
     >
       {children}

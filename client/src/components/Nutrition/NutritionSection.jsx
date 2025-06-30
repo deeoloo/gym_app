@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 import Card from '../Card';
 import LoadingSpinner from '../LoadingSpinner';
 import { useAppContext } from '../../contexts/AppContext';
+import NutritionForm from './NutritionForm';
 
 
 const NutritionSection = () => {
-  const { data, loading, error } = useApi('/api/nutrition');
+  const { data, loading, error, refetch } = useApi('/api/nutrition');
   const { profileData, savedRecipe } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -22,6 +23,9 @@ const NutritionSection = () => {
   return (
     <section className="p-6">
       <h2 className="section-title">Nutrition</h2>
+
+        <NutritionForm onCreated={refetch} />
+
 
       <input
         type="text"
@@ -40,6 +44,7 @@ const NutritionSection = () => {
               data={plan}
               isCompleted={profileData.savedRecipes.some(r => r.id === plan.id)}
               onAction={() => savedRecipe(plan)}
+              onDelete={handleDeleteNutrition}
             />
           ))
         ) : (
