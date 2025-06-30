@@ -9,7 +9,7 @@ GymHum is a full-stack fitness and social web application that enables users to 
 
 | Layer       | Technology                     |
 |-------------|--------------------------------|
-| Frontend    | React (Vite), Tailwind CSS     |
+| Frontend    | React (Vite)     |
 | Backend     | Flask, Flask-JWT-Extended      |
 | Database    | PostgreSQL + SQLAlchemy        |
 | Auth        | JWT (Token stored in `localStorage`) |
