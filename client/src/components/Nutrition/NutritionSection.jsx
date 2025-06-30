@@ -2,14 +2,16 @@ import useApi from '../../hooks/useApi';
 import React, { useState } from 'react';
 import Card from '../Card';
 import LoadingSpinner from '../LoadingSpinner';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppContext} from '../../contexts/AppContext';
 import NutritionForm from './NutritionForm';
 
 
 const NutritionSection = () => {
   const { data, loading, error, refetch } = useApi('/api/nutrition');
-  const { profileData, savedRecipe } = useAppContext();
+  const { profileData, savedRecipe, handleDeleteNutrition, user } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="error-message">Error: {error}</div>;
@@ -24,8 +26,14 @@ const NutritionSection = () => {
     <section className="p-6">
       <h2 className="section-title">Nutrition</h2>
 
-        <NutritionForm onCreated={refetch} />
+      <h2
+        className="link-heading"
+        onClick={() => setShowForm(prev => !prev)}
+      >
+        {showForm ? 'Hide Form' : 'Add Nutrition'}
+      </h2>
 
+      {showForm && <NutritionForm onCreated={refetch} />}
 
       <input
         type="text"
@@ -44,7 +52,8 @@ const NutritionSection = () => {
               data={plan}
               isCompleted={profileData.savedRecipes.some(r => r.id === plan.id)}
               onAction={() => savedRecipe(plan)}
-              onDelete={handleDeleteNutrition}
+              onDelete={user?.id === plan.user?.id ? handleDeleteNutrition : undefined}
+              currentUser={user}
             />
           ))
         ) : (

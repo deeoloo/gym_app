@@ -1,8 +1,8 @@
 // components/Card.jsx
 import fallbackImage from '/images/download6.jpeg'; 
 
-const Card = ({ type, data, isCompleted = false, onAction = () => {} }) => {
-  const renderWorkoutCard = ({ data, onAction, isCompleted }) => {
+const Card = ({ type, data, isCompleted = false, onAction = () => {}, onDelete, currentUser }) => {
+  const renderWorkoutCard = ({ data, onAction, isCompleted, onDelete }) => {
     const exercises =
       typeof data.exercises === 'string'
         ? data.exercises.split('\n')
@@ -35,13 +35,13 @@ const Card = ({ type, data, isCompleted = false, onAction = () => {} }) => {
             {isCompleted ? 'Completed ✓' : 'Mark Complete'}
           </button>
 
-          {onDelete && (
-          <button
-            onClick={() => onDelete(data.id)}
-            className="delete-button"
-          >
-            Delete Workout
-          </button>
+          {onDelete && currentUser?.id === data.user?.id && (
+            <button
+              onClick={() => onDelete(data.id)}
+              className="delete-button"
+            >
+              Delete Workout
+            </button>
           )}
 
         </div>
@@ -67,14 +67,14 @@ const Card = ({ type, data, isCompleted = false, onAction = () => {} }) => {
         >
           {isCompleted ? 'Saved ✓' : 'Save Recipe'}
         </button>
-        {onDelete && (
-        <button
-          onClick={() => onDelete(data.id)}
-          className="delete-button"
-        >
-          Delete Nutrition
-        </button>
-        )}
+          {onDelete && currentUser?.id === data.user?.id && (
+          <button
+            onClick={() => onDelete(data.id)}
+            className="delete-button"
+          >
+            Delete Nutrition
+          </button>
+          )}
       </div>
     </div>
   );
@@ -127,9 +127,9 @@ const Card = ({ type, data, isCompleted = false, onAction = () => {} }) => {
   // Main switch to choose what to render
   switch (type) {
     case 'workout':
-      return renderWorkoutCard({ data, onAction, isCompleted });
+      return renderWorkoutCard({ data, onAction, isCompleted, onDelete });
     case 'nutrition':
-      return renderNutritionCard({ data, onAction, isCompleted });
+      return renderNutritionCard({ data, onAction, isCompleted, onDelete });
     case 'product':
       return renderProductCard({ data, onAction, isCompleted });
     default:

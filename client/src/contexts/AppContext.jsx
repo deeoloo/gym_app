@@ -171,19 +171,34 @@ export const AppProvider = ({ children }) => {
 
 const handleDeleteNutrition = async (id) => {
   if (!window.confirm('Delete this nutrition plan?')) return;
+
   try {
     const res = await fetch(`/api/nutrition/${id}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
       }
     });
-    if (res.ok) refetch();
-    else alert('Failed to delete');
-  } catch {
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error('Delete failed:', errorData.message);
+      alert('Failed to delete');
+      return;
+    }
+
+    // ✅ Directly update UI without full refresh
+    setProfileData(prev => ({
+      ...prev,
+      savedRecipes: prev.savedRecipes.filter(recipe => recipe.id !== id)
+    }));
+  } catch (err) {
+    console.error('Delete error:', err);
     alert('Error deleting nutrition');
   }
 };
+
 
 
   const savedRecipe = (recipe) => {

@@ -25,7 +25,7 @@ const WorkoutForm = ({ onCreated }) => {
     setMessage('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/workouts/', {
+      const res = await fetch('/api/workouts/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

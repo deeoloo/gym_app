@@ -8,9 +8,11 @@ import WorkoutForm from './WorkoutForm';
 
 const WorkoutsSection = () => {
   const { data, loading, error, refetch } = useApi('/api/workouts');
-  const { profileData, completeWorkout } = useAppContext();
+  const { profileData, completeWorkout, handleDeleteWorkout, user } = useAppContext();
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="error-message">Error: {error}</div>;
@@ -28,8 +30,14 @@ const WorkoutsSection = () => {
     <section className="workouts-section">
       <h2 className="section-title">Workouts</h2>
 
-      {/* Workout Form */}
-      <WorkoutForm onCreated={refetch} />
+      <h3
+        className="link-heading"
+        onClick={() => setShowForm(prev => !prev)}
+      >
+        {showForm ? 'Hide Form' : 'Add Workout'}
+      </h3>
+      {showForm && <WorkoutForm onCreated={refetch} />}
+
       
       {/* Search Bar */}
       <div className="search-container">
@@ -61,7 +69,8 @@ const WorkoutsSection = () => {
             data={workout}
             isCompleted={profileData.completedWorkouts.includes(workout.id)}
             onAction={() => completeWorkout(workout)}
-            onDelete={handleDeleteWorkout}
+            onDelete={user?.id === workout.user?.id ? handleDeleteWorkout : undefined}
+            currentUser={user}
           />
         ))}
       </div>
