@@ -25,7 +25,7 @@ const CommunitySection = () => {
   const handlePostSubmit = () => {
     if (!postContent.trim()) return;
 
-    fetch('http://localhost:5000/api/posts', {
+    fetch('/api/posts', {
       method: 'POST',
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -43,7 +43,7 @@ const CommunitySection = () => {
   };
 
   const handleJoinChallenge = (challengeId) => {
-    fetch(`http://localhost:5000/api/challenges/${challengeId}/join`, {
+    fetch(`/api/challenges/${challengeId}/join`, {
       method: 'POST',
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -63,7 +63,7 @@ const CommunitySection = () => {
 
 
   const handleAddFriend = (friendId, friendName) => {
-    fetch(`http://localhost:5000/api/friends/${friendId}`, {
+    fetch(`/api/friends/${friendId}`, {
       method: 'POST',
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -83,7 +83,7 @@ const CommunitySection = () => {
   };
 
   const handleRemoveFriend = (friendId) => {
-    fetch(`http://localhost:5000/api/friends/${friendId}`, {
+    fetch(`/api/friends/${friendId}`, {
       method: 'DELETE',
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -105,7 +105,7 @@ const CommunitySection = () => {
     }
 
 
-    fetch('http://localhost:5000/api/challenges', {
+    fetch('/api/challenges', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -122,7 +122,7 @@ const CommunitySection = () => {
       return;
     }
 
-    fetch('http://localhost:5000/api/posts', {
+    fetch('/api/posts', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -145,7 +145,7 @@ const CommunitySection = () => {
     }
  
 
-    fetch('http://localhost:5000/api/users/suggestions', {
+    fetch('/api/users/suggestions', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -169,7 +169,7 @@ const CommunitySection = () => {
       return;
     }
 
-    fetch('http://localhost:5000/api/friends', {
+    fetch('/api/friends', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

@@ -1,10 +1,11 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from config import Config
 from flask_bcrypt import Bcrypt
+import os
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -12,7 +13,9 @@ jwt = JWTManager()
 bcrypt = Bcrypt()
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    app = Flask(__name__,
+    static_url_path='/',
+    static_folder='../client/dist',)
     app.config.from_object(config_class)
     app.url_map.strict_slashes = False
 
@@ -58,8 +61,22 @@ def create_app(config_class=Config):
     app.register_blueprint(friend_controller.friend_bp, url_prefix='/api/friends')
     app.register_blueprint(nutrition_controller.nutrition_bp, url_prefix='/api/nutrition')
     app.register_blueprint(product_controller.product_bp, url_prefix='/api/products')
+
+
+
+    @app.route("/", defaults={"path": ""})
+    @app.route("/<path:path>")
+    def serve_vue(path):  # Vite/React/Vue—all work the same
+        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, "index.html")
     
     return app
+
+
+
+
 
 if __name__ == '__main__':
     app = create_app()

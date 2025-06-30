@@ -77,7 +77,7 @@ export const AppProvider = ({ children }) => {
       }
 
       try {
-        const res = await fetch('http://localhost:5000/api/profile', {
+        const res = await fetch('/api/profile', {
           headers: {
             Authorization: `Bearer ${currentToken}`,
             'Content-Type': 'application/json',
