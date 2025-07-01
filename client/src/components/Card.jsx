@@ -1,5 +1,5 @@
 // components/Card.jsx
-import fallbackImage from '/images/download6.jpeg'; 
+
 
 const Card = ({ type, data, isCompleted = false, onAction = () => {}, onDelete, currentUser }) => {
   const renderWorkoutCard = ({ data, onAction, isCompleted, onDelete }) => {
@@ -83,7 +83,7 @@ const Card = ({ type, data, isCompleted = false, onAction = () => {}, onDelete, 
     <div className="section-wrapper">
       {data.image_url ? (
         <img
-          src={data.image}
+          src={data.image_url}
           alt={data.name}
           className="card-image"
           onError={(e) => {

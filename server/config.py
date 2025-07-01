@@ -14,5 +14,5 @@ class Config:
 
     # CORS settings
     CORS_ORIGINS = ['http://localhost:5173']
-    SERVER_PORT = 5000
+    SERVER_PORT = 8000
     DEBUG = True

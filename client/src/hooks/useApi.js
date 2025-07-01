@@ -17,7 +17,7 @@ const useApi = (url, options = {}) => {
         ...options.headers,
       };
 
-      const response = await fetch(url.startsWith('http') ? url : `http://localhost:5000${url}`, {
+      const response = await fetch(url.startsWith('http') ? url : `${url}`, {
         ...options,
         headers,
       });
