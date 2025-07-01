@@ -195,21 +195,46 @@ def seed_nutrition_plans(users, num_plans=50):
         db.session.add(plan)
     db.session.commit()
 
-def seed_products(num_products=30):
-    """Seed fitness products"""
+def seed_products():
+    """Seed fitness products using real images"""
     print("Seeding products...")
-    categories = ["Protein", "Vitamins", "Equipment", "Apparel", "Accessories"]
-    for _ in range(num_products):
+
+    products = [
+        {
+            "name": "Leg Press Machine",
+            "features": "Heavy-duty leg press machine with adjustable resistance. Ideal for building lower body strength.",
+            "price": 1299.99,
+            "category": "Equipment",
+            "image_url": "/images/leg _machine.jpg"
+        },
+        {
+            "name": "Adjustable Gym Recliner",
+            "features": "Ergonomic recliner designed for post-workout recovery or seated exercises. Durable and comfortable.",
+            "price": 499.50,
+            "category": "Equipment",
+            "image_url": "/images/recliner.jpeg"
+        },
+        {
+            "name": "Veriliss 3pcs Gym Set (Women)",
+            "features": "Stylish and breathable activewear set including leggings, sports bra, and top. Perfect for daily training.",
+            "price": 74.99,
+            "category": "Apparel",
+            "image_url": "/images/veriliss-3pcs-gym-clothes-for-women.jpg"
+        }
+    ]
+
+    for item in products:
         product = Product(
-            name=fake.catch_phrase(),
-            features=fake.paragraph(),
-            price=round(random.uniform(5, 200), 2),
-            category=random.choice(categories),
-            image_url=fake.image_url(),
-            created_at=fake.date_time_this_year()
+            name=item["name"],
+            features=item["features"],
+            price=item["price"],
+            category=item["category"],
+            image_url=item["image_url"]
         )
         db.session.add(product)
+
     db.session.commit()
+
 
 def seed_database():
     """Main seeding function"""
