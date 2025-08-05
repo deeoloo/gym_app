@@ -33,46 +33,13 @@ export const AppProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('refresh_token');
-  };
-
-  // const refreshAccessToken = async () => {
-  //   const refreshToken = localStorage.getItem('refresh_token');
-  //   if (!refreshToken || refreshToken === 'null') return false;
-
-  //   try {
-  //     const res = await fetch('http://localhost:5000/api/auth/refresh', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Authorization': `Bearer ${refreshToken}`,
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ refresh_token: refreshToken })
-  //     });
-
-  //     if (!res.ok) throw new Error('Refresh failed');
-
-  //     const data = await res.json();
-  //     localStorage.setItem('token', data.access_token);
-  //     setToken(data.access_token);
-  //     return true;
-  //   } catch (err) {
-  //     console.error('🔁 Refresh token failed:', err);
-  //     logout();
-  //     return false;
-  //   }
-  // };
- 
+  }; 
   
   useEffect(() => {
     const loadProfile = async () => {
       let currentToken = token;
 
       if (!currentToken || currentToken.split('.').length !== 3) {
-        // const refreshed = await refreshAccessToken();
-        // if (!refreshed) {
-        //   setLoadingProfile(false);
-        //   return;
-        // }
         currentToken = localStorage.getItem('token');
       }
 
@@ -188,6 +155,39 @@ const handleDeleteNutrition = async (id) => {
       return;
     }
 
+
+const updateNutrition = async (planId, updates) => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(`/api/nutrition/${planId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
+      });
+
+      if (!res.ok) throw new Error('Update failed');
+      const updatedPlan = await res.json();
+
+    // ✅ Optionally update UI state
+      setProfileData(prev => ({
+        ...prev,
+        savedRecipes: prev.savedRecipes.map(p =>
+          p.id === updatedPlan.id ? updatedPlan : p
+        )
+      }));
+
+      alert("Nutrition plan updated!");
+    } catch (err) {
+      console.error("Error updating nutrition plan:", err);
+      alert("Failed to update plan.");
+    }
+  };
+
+
     // ✅ Directly update UI without full refresh
     setProfileData(prev => ({
       ...prev,
@@ -253,6 +253,7 @@ const handleDeleteNutrition = async (id) => {
         savedRecipe,
         handleDeleteWorkout,
         handleDeleteNutrition,
+        updateNutrition,
       }}
     >
       {children}

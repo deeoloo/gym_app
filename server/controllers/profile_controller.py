@@ -6,6 +6,7 @@ from models.post import Post
 profile_bp = Blueprint('profile', __name__)
 
 @profile_bp.route('/', methods=['GET'])
+@profile_bp.route('', methods=['GET'])
 @jwt_required()
 def get_profile():
     try:
