@@ -1,7 +1,7 @@
 // Login.jsx
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // adjust path if needed
+import { AuthContext } from '../contexts/AuthContext'; 
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });

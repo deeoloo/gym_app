@@ -71,7 +71,7 @@ const NutritionSection = () => {
         savedRecipes: prev.savedRecipes.filter(recipe => recipe.id !== id)
       }));
 
-      fetchNutrition(); // ✅ manual refetch
+      fetchNutrition(); 
     } catch (err) {
       console.error('Delete error:', err);
       alert('Error deleting nutrition');

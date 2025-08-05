@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext'; // ✅ Adjust path as needed
+import { AuthContext } from '../../contexts/AuthContext';
 
 const ProfileSection = () => {
-  const { user, token } = useContext(AuthContext); // ✅ Centralized user data
+  const { user, token } = useContext(AuthContext); 
   const [profileData, setProfileData] = useState({
     completedWorkouts: [],
     completedWorkoutDetails: [],

@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext'; // ✅ adjust the path if needed
+import { AuthContext } from '../contexts/AuthContext';
 
 const CommunitySection = () => {
-  const { token, user } = useContext(AuthContext); // ✅ Use context
+  const { token, user } = useContext(AuthContext); 
   const [postContent, setPostContent] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showMessage, setShowMessage] = useState(false);
@@ -172,7 +172,7 @@ const CommunitySection = () => {
         setFriends([]);
       });
   }, [token]);
-    
+
    return (
     <section className="community-section">
       {showMessage && (

@@ -1,9 +1,9 @@
 // components/Workout/WorkoutForm.jsx
 import React, { useState, useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext'; // ✅ Correct context
+import { AuthContext } from '../../contexts/AuthContext'; 
 
 const WorkoutForm = ({ onCreated }) => {
-  const { token } = useContext(AuthContext); // ✅ Use AuthContext directly
+  const { token } = useContext(AuthContext); 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -44,7 +44,7 @@ const WorkoutForm = ({ onCreated }) => {
           difficulty: '',
           exercises: '',
         });
-        onCreated?.(); // Optional refresh
+        onCreated?.(); 
       } else {
         setMessage(data.message || 'Error creating workout');
       }

@@ -1,9 +1,9 @@
 // components/Nutrition/NutritionForm.jsx
 import React, { useState, useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext'; // ✅ Corrected import
+import { AuthContext } from '../../contexts/AuthContext';
 
 const NutritionForm = ({ onCreated }) => {
-  const { token } = useContext(AuthContext); // ✅ Using AuthContext
+  const { token } = useContext(AuthContext); 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -46,7 +46,7 @@ const NutritionForm = ({ onCreated }) => {
           carbs: '',
           fats: '',
         });
-        onCreated?.(); // Optional callback
+        onCreated?.(); 
       } else {
         setMessage(data.message || 'Error creating plan.');
       }

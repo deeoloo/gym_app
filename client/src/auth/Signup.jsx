@@ -1,7 +1,7 @@
 // Signup.jsx
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // adjust the path if needed
+import { AuthContext } from '../contexts/AuthContext';
 
 const Signup = () => {
   const [formData, setFormData] = useState({

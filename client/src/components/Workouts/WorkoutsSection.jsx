@@ -5,7 +5,7 @@ import WorkoutForm from './WorkoutForm';
 import { AuthContext } from '../../contexts/AuthContext';
 
 const WorkoutsSection = () => {
-  const { user, token } = useContext(AuthContext); // ✅ Pull user/token from AuthContext
+  const { user, token } = useContext(AuthContext);
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,7 +69,7 @@ const WorkoutsSection = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (res.ok) fetchWorkouts(); // ✅ Manual refetch
+      if (res.ok) fetchWorkouts(); 
       else alert('Failed to delete');
     } catch {
       alert('Error deleting workout');
@@ -119,7 +119,6 @@ const WorkoutsSection = () => {
         >
           All
         </button>
-        {/* Add more filters if categories exist */}
       </div>
 
       <div className="workout-list">

@@ -2,11 +2,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileSection from '../components/Profile/ProfileSection';
-import { AuthContext } from '../contexts/AuthContext'; // ✅ Adjust path as needed
+import { AuthContext } from '../contexts/AuthContext'; 
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { token, logout } = useContext(AuthContext); // ✅ use context
+  const { token, logout } = useContext(AuthContext);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [profileData, setProfileData] = useState(null);
 
@@ -31,7 +31,7 @@ const Dashboard = () => {
         setProfileData(data);
       } catch (err) {
         console.error('Error loading profile:', err);
-        logout?.(); // logout gracefully
+        logout?.(); 
       } finally {
         setLoadingProfile(false);
       }

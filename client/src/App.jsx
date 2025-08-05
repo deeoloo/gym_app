@@ -1,13 +1,13 @@
-import { AppProvider } from './contexts/AppContext';
+import { AuthProvider } from './contexts/AuthContext';
 import AuthLayout from './auth/AuthLayout';
 import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
     <ErrorBoundary>
-      <AppProvider>
+      <AuthProvider>
         <AuthLayout />
-      </AppProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
