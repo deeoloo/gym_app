@@ -2,12 +2,23 @@ import React, { useState, useEffect } from 'react';
 import Card from '../Card';
 import LoadingSpinner from '../LoadingSpinner';
 
-
 const ProductsSection = () => {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useLocalStorage('cart', []);
+  const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  
+  useEffect(() => {
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) {
+      setCart(JSON.parse(storedCart));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   const fetchProducts = async () => {
     setLoading(true);
