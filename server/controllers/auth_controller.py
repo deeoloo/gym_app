@@ -8,18 +8,22 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    required_fields = ['username', 'email', 'password', 'bio']
-    if not all(field in data for field in required_fields):
-        return jsonify({'message': 'Missing required fields'}), 400
-
-    if User.query.filter_by(username=data['username']).first():
-        return jsonify({'message': 'Username already exists'}), 400
-
-    if User.query.filter_by(email=data['email']).first():
-        return jsonify({'message': 'Email already exists'}), 400
-
     try:
+        data = request.get_json() or {}
+        required_fields = ['username', 'email', 'password', 'bio']
+
+        # Validate required fields
+        if not all(field in data and data[field] for field in required_fields):
+            return jsonify({'message': 'Missing required fields'}), 400
+
+        # Check for duplicate username or email
+        if User.query.filter_by(username=data['username']).first():
+            return jsonify({'message': 'Username already exists'}), 400
+
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({'message': 'Email already exists'}), 400
+
+        # Create new user
         user = User(
             username=data['username'],
             email=data['email'],
@@ -27,20 +31,26 @@ def register():
             bio=data['bio']
         )
         user.password = data['password']
+
         db.session.add(user)
         db.session.commit()
 
         access_token = create_access_token(identity=user.id, expires_delta=False)
-        refresh_token =create_refresh_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+
         return jsonify({
             'message': 'Registration successful',
             'access_token': access_token,
-            'refresh_token':refresh_token,
+            'refresh_token': refresh_token,
             'user': user.to_dict()
         }), 201
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': str(e)}), 400
+        import traceback
+        traceback.print_exc()
+        return jsonify({'message': 'Internal server error'}), 500
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
