@@ -1,9 +1,9 @@
 // components/Workout/WorkoutForm.jsx
-import React, { useState } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from '../../contexts/AuthContext'; // ✅ Correct context
 
 const WorkoutForm = ({ onCreated }) => {
-  const { token } = useAppContext();
+  const { token } = useContext(AuthContext); // ✅ Use AuthContext directly
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -25,7 +25,7 @@ const WorkoutForm = ({ onCreated }) => {
     setMessage('');
 
     try {
-      const res = await fetch('/api/workouts/', {
+      const res = await fetch('/api/workouts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ const WorkoutForm = ({ onCreated }) => {
           difficulty: '',
           exercises: '',
         });
-        onCreated?.(); // Optional callback to refresh workout list
+        onCreated?.(); // Optional refresh
       } else {
         setMessage(data.message || 'Error creating workout');
       }
@@ -59,11 +59,39 @@ const WorkoutForm = ({ onCreated }) => {
     <form onSubmit={handleSubmit} className="workout-form mb-6">
       <h3 className="text-lg font-semibold mb-2">Add New Workout</h3>
 
-      <input name="name" placeholder="Workout Name" value={formData.name} onChange={handleChange} required />
-      <input name="description" placeholder="Description" value={formData.description} onChange={handleChange} />
-      <input name="duration" type="number" placeholder="Duration (mins)" value={formData.duration} onChange={handleChange} required />
-      <input name="difficulty" placeholder="Difficulty (e.g., Easy, Moderate, Hard)" value={formData.difficulty} onChange={handleChange} />
-      <input name="exercises" placeholder="Exercises (comma-separated)" value={formData.exercises} onChange={handleChange} />
+      <input
+        name="name"
+        placeholder="Workout Name"
+        value={formData.name}
+        onChange={handleChange}
+        required
+      />
+      <input
+        name="description"
+        placeholder="Description"
+        value={formData.description}
+        onChange={handleChange}
+      />
+      <input
+        name="duration"
+        type="number"
+        placeholder="Duration (mins)"
+        value={formData.duration}
+        onChange={handleChange}
+        required
+      />
+      <input
+        name="difficulty"
+        placeholder="Difficulty (e.g., Easy, Moderate, Hard)"
+        value={formData.difficulty}
+        onChange={handleChange}
+      />
+      <input
+        name="exercises"
+        placeholder="Exercises (comma-separated)"
+        value={formData.exercises}
+        onChange={handleChange}
+      />
 
       <button type="submit" disabled={loading} className="form-button mt-2">
         {loading ? 'Submitting...' : 'Add Workout'}

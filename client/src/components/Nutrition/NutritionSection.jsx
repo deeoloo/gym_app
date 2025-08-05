@@ -1,26 +1,120 @@
-import useApi from '../../hooks/useApi';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Card from '../Card';
 import LoadingSpinner from '../LoadingSpinner';
-import { useAppContext} from '../../contexts/AppContext';
 import NutritionForm from './NutritionForm';
-
+import { AuthContext } from '../../contexts/AuthContext';
 
 const NutritionSection = () => {
-  const { data, loading, error, refetch } = useApi('/api/nutrition');
-  const { profileData, savedRecipe, handleDeleteNutrition, user } = useAppContext();
+  const { token, user, logout } = useContext(AuthContext);
+  const [nutritionData, setNutritionData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
 
+  const [profileData, setProfileData] = useState({
+    completedWorkouts: [],
+    completedWorkoutDetails: [],
+    communityChallenges: [],
+    friends: [],
+    posts: [],
+    savedRecipes: [],
+  });
+
+  const fetchNutrition = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/nutrition', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      if (!res.ok) throw new Error('Failed to fetch nutrition data');
+      const data = await res.json();
+      setNutritionData(data.plans || []);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchNutrition();
+    }
+  }, [token]);
+
+  const handleDeleteNutrition = async (id) => {
+    if (!window.confirm('Delete this nutrition plan?')) return;
+
+    try {
+      const res = await fetch(`/api/nutrition/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Delete failed:', errorData.message);
+        alert('Failed to delete');
+        return;
+      }
+
+      setProfileData(prev => ({
+        ...prev,
+        savedRecipes: prev.savedRecipes.filter(recipe => recipe.id !== id)
+      }));
+
+      fetchNutrition(); // ✅ manual refetch
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Error deleting nutrition');
+    }
+  };
+
+  const savedRecipe = (recipe) => {
+    fetch(`/api/nutrition/${recipe.id}/save`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Save failed');
+        return res.json();
+      })
+      .then(() => {
+        setProfileData((prev) => ({
+          ...prev,
+          savedRecipes: [
+            ...prev.savedRecipes,
+            {
+              id: recipe.id,
+              name: recipe.name,
+              date: new Date().toISOString(),
+            },
+          ],
+        }));
+      })
+      .catch((err) => {
+        console.error('Error saving recipe:', err);
+        if (err.message.includes('token')) logout?.();
+      });
+  };
+
+  const filteredPlans = nutritionData.filter(plan =>
+    plan.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="error-message">Error: {error}</div>;
-
-  const plans = data?.plans || []; // <-- extract the actual array
-
-  const filteredPlans = plans.filter(plan =>
-    plan.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <section className="p-6">
@@ -33,7 +127,7 @@ const NutritionSection = () => {
         {showForm ? 'Hide Form' : 'Add Nutrition'}
       </h2>
 
-      {showForm && <NutritionForm onCreated={refetch} />}
+      {showForm && <NutritionForm onCreated={fetchNutrition} />}
 
       <input
         type="text"

@@ -1,12 +1,44 @@
 // pages/Dashboard.jsx
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileSection from '../components/Profile/ProfileSection';
-import { useAppContext } from '../contexts/AppContext';
-
+import { AuthContext } from '../contexts/AuthContext'; // ✅ Adjust path as needed
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { loadingProfile } = useAppContext();
+  const { token, logout } = useContext(AuthContext); // ✅ use context
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      let currentToken = token;
+
+      if (!currentToken || currentToken.split('.').length !== 3) {
+        currentToken = localStorage.getItem('token');
+      }
+
+      try {
+        const res = await fetch('/api/profile', {
+          headers: {
+            Authorization: `Bearer ${currentToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!res.ok) throw new Error('Invalid or expired token');
+        const data = await res.json();
+        setProfileData(data);
+      } catch (err) {
+        console.error('Error loading profile:', err);
+        logout?.(); // logout gracefully
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    loadProfile();
+  }, [token, logout]);
 
   return (
     <div className="dashboard">
@@ -19,7 +51,7 @@ const Dashboard = () => {
         {loadingProfile ? (
           <p className="loading-text">Loading profile...</p>
         ) : (
-          <ProfileSection />
+          <ProfileSection externalProfileData={profileData} />
         )}
       </section>
 

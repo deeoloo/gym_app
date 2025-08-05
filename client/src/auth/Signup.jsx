@@ -1,6 +1,7 @@
 // Signup.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext'; // adjust the path if needed
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -12,11 +13,11 @@ const Signup = () => {
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { token, login } = useContext(AuthContext);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     if (token) navigate('/dashboard');
-  }, []);
+  }, [token, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,9 +48,8 @@ const Signup = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Signup failed');
 
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      login(data.user, data.access_token); // ✅ set token + user in context/localStorage
+      localStorage.setItem('refresh_token', data.refresh_token); // optional
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

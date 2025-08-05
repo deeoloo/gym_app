@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
-
-
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext'; // ✅ adjust the path if needed
 
 const CommunitySection = () => {
-  const { profileData, setProfileData, token, user} = useAppContext();
+  const { token, user } = useContext(AuthContext); // ✅ Use context
   const [postContent, setPostContent] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showMessage, setShowMessage] = useState(false);
@@ -13,8 +11,14 @@ const CommunitySection = () => {
   const [posts, setPosts] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [friends, setFriends] = useState([]);
-
-  
+  const [profileData, setProfileData] = useState({
+    completedWorkouts: [],
+    completedWorkoutDetails: [],
+    communityChallenges: [],
+    friends: [],
+    posts: [],
+    savedRecipes: [],
+  });
 
   const showCommunityMessage = (msg) => {
     setMessage(msg);
@@ -28,9 +32,9 @@ const CommunitySection = () => {
     fetch('/api/posts', {
       method: 'POST',
       headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ content: postContent })
     })
       .then(res => res.json())
@@ -46,29 +50,27 @@ const CommunitySection = () => {
     fetch(`/api/challenges/${challengeId}/join`, {
       method: 'POST',
       headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     })
       .then(res => res.json())
       .then(data => {
         showCommunityMessage(`Joined ${data.challenge.name}`);
         setProfileData(prev => ({
           ...prev,
-            communityChallenges: [...prev.communityChallenges, data.challenge]
+          communityChallenges: [...prev.communityChallenges, data.challenge]
         }));
-
       });
   };
-
 
   const handleAddFriend = (friendId, friendName) => {
     fetch(`/api/friends/${friendId}`, {
       method: 'POST',
       headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     })
       .then(res => res.json())
       .then(data => {
@@ -86,9 +88,9 @@ const CommunitySection = () => {
     fetch(`/api/friends/${friendId}`, {
       method: 'DELETE',
       headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     })
       .then(res => res.json())
       .then(data => {
@@ -97,34 +99,29 @@ const CommunitySection = () => {
       })
       .catch(err => console.error("Failed to remove friend:", err));
   };
- 
-  useEffect(() => {
-    if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
-      console.warn('🚫 Skipping fetch: invalid or missing token:', token);
-      return;
-    }
 
+  const isTokenValid = (token) =>
+    token && typeof token === 'string' && token.split('.').length === 3;
+
+  useEffect(() => {
+    if (!isTokenValid(token)) return;
 
     fetch('/api/challenges', {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
       .then(res => res.json())
       .then(setChallenges);
-  }, [token]);  // ✅ stable dependency array
-
+  }, [token]);
 
   useEffect(() => {
-    if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
-      console.warn('🚫 Skipping fetch: invalid or missing token:', token);
-      return;
-    }
+    if (!isTokenValid(token)) return;
 
     fetch('/api/posts', {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
@@ -133,45 +130,32 @@ const CommunitySection = () => {
       .catch(err => {
         console.error("Error loading posts:", err);
         setPosts([]);
-    });
-  }, [token]);  // ✅ stable dependency array
-
-
+      });
+  }, [token]);
 
   useEffect(() => {
-    if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
-      console.warn('🚫 Skipping fetch: invalid or missing token:', token);
-      return;
-    }
- 
+    if (!isTokenValid(token)) return;
 
     fetch('/api/users/suggestions', {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
-    .then(res => res.json())
-    .then(data => {
-      console.log("Suggestions response:", data);
-      setSuggestions(data?.data?.users || []);
-    })
-    .catch(err => {
-      console.error("Failed to fetch suggestions:", err);
-      setSuggestions([]);
-    });
-  }, [token]);  
-
+      .then(res => res.json())
+      .then(data => setSuggestions(data?.data?.users || []))
+      .catch(err => {
+        console.error("Failed to fetch suggestions:", err);
+        setSuggestions([]);
+      });
+  }, [token]);
 
   useEffect(() => {
-    if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
-      console.warn('🚫 Skipping fetch: invalid or missing token:', token);
-      return;
-    }
+    if (!isTokenValid(token)) return;
 
     fetch('/api/friends', {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
@@ -181,14 +165,14 @@ const CommunitySection = () => {
         setProfileData(prev => ({
           ...prev,
           friends: data.friends || []
-      }));
+        }));
       })
       .catch(err => {
         console.error("Failed to fetch friends:", err);
         setFriends([]);
       });
   }, [token]);
-  
+    
    return (
     <section className="community-section">
       {showMessage && (

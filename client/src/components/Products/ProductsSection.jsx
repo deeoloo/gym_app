@@ -1,25 +1,47 @@
-import useApi from '../../hooks/useApi';
-import { useAppContext } from '../../contexts/AppContext';
+import React, { useState, useEffect } from 'react';
 import Card from '../Card';
 import LoadingSpinner from '../LoadingSpinner';
 
+
 const ProductsSection = () => {
-  const { data, loading, error } = useApi('/api/products');
-  const { cart, addToCart, removeFromCart } = useAppContext();
+  const [products, setProducts] = useState([]);
+  const [cart, setCart] = useLocalStorage('cart', []);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/products');
+      if (!res.ok) throw new Error('Failed to fetch products');
+      const data = await res.json();
+      setProducts(data.products || []);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const addToCart = (product) => setCart([...cart, product]);
+  const removeFromCart = () => setCart([]);
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="error-message">Error: {error}</div>;
 
-  const products = data?.products || []; // <-- extract the array
-
   return (
     <section className="p-6">
       <h2 className="section-title">Fitness Products</h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {products.length > 0
           ? products.map(product => (
-              <Card 
+              <Card
                 key={product.id}
                 type="product"
                 data={product}
@@ -33,15 +55,13 @@ const ProductsSection = () => {
       {cart.length > 0 && (
         <div className="cart-summary">
           <p>{cart.length} item(s) in cart</p>
-            <button onClick={removeFromCart} className="btn btn-danger">
-              Clear Cart
-            </button>
+          <button onClick={removeFromCart} className="btn btn-danger">
+            Clear Cart
+          </button>
         </div>
       )}
-
     </section>
   );
 };
-
 
 export default ProductsSection;

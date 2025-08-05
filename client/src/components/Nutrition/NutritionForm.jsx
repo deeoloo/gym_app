@@ -1,9 +1,9 @@
 // components/Nutrition/NutritionForm.jsx
-import React, { useState } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from '../../contexts/AuthContext'; // ✅ Corrected import
 
 const NutritionForm = ({ onCreated }) => {
-  const { token } = useAppContext();
+  const { token } = useContext(AuthContext); // ✅ Using AuthContext
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -26,7 +26,7 @@ const NutritionForm = ({ onCreated }) => {
     setMessage('');
 
     try {
-      const res = await fetch('/api/nutrition/', {
+      const res = await fetch('/api/nutrition', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ const NutritionForm = ({ onCreated }) => {
           carbs: '',
           fats: '',
         });
-        onCreated?.(); // Optional callback to refresh nutrition list
+        onCreated?.(); // Optional callback
       } else {
         setMessage(data.message || 'Error creating plan.');
       }

@@ -1,10 +1,11 @@
 import { Outlet, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext'; // ✅ Adjust path as needed
 
 const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const user = JSON.parse(localStorage.getItem('user'));
+  const { user, logout } = useContext(AuthContext); // ✅ Use centralized state
 
   const isActive = (path) => location.pathname === path;
 
@@ -13,8 +14,7 @@ const Layout = () => {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    logout(); // ✅ Clear token and user from context and localStorage
     navigate('/', { replace: true });
   };
 

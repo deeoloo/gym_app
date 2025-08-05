@@ -1,20 +1,17 @@
 // Login.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAppContext } from '../contexts/AppContext';
-
+import { AuthContext } from '../contexts/AuthContext'; // adjust path if needed
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { setToken, setUser } = useAppContext();
-
+  const { login, token } = useContext(AuthContext);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     if (token) navigate('/dashboard');
-  }, []);
+  }, [token, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,11 +32,8 @@ const Login = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Login failed');
 
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setToken(data.access_token);   // ✅ updates React state
-      setUser(data.user);            // ✅ updates React state
+      login(data.user, data.access_token); // ✅ uses AuthContext
+      localStorage.setItem('refresh_token', data.refresh_token); // optional: store refresh token
       navigate('/dashboard');
 
     } catch (err) {
