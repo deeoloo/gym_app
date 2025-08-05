@@ -66,8 +66,7 @@ def create_app(config_class=Config):
 
     @app.errorhandler(404)
     def not_found(e):
-        return 
-    send_from_directory(app.static_folder, "index.html")
+        return send_from_directory(app.static_folder, "index.html")
     
     return app
 
