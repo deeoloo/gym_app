@@ -64,13 +64,10 @@ def create_app(config_class=Config):
 
 
 
-    @app.route("/", defaults={"path": ""})
-    @app.route("/<path:path>")
-    def serve_vue(path):  # Vite/React/Vue—all work the same
-        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-            return send_from_directory(app.static_folder, path)
-        else:
-            return send_from_directory(app.static_folder, "index.html")
+    @app.errorhandler(404)
+    def not_found(e):
+        return 
+    send_from_directory(app.static_folder, "index.html")
     
     return app
 
