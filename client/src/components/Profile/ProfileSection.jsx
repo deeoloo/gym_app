@@ -4,7 +4,6 @@ import { AuthContext } from '../../contexts/AuthContext';
 const ProfileSection = ({ externalProfileData }) => {
   const { user } = useContext(AuthContext);
 
-  // Simple, clean state: initialize once; then fully replace when prop changes
   const [profileData, setProfileData] = useState(
     externalProfileData || {
       completedWorkouts: [],
@@ -19,11 +18,33 @@ const ProfileSection = ({ externalProfileData }) => {
     }
   );
 
+  // Apply server data when it arrives (Dashboard fetch)
   useEffect(() => {
     if (externalProfileData) {
       setProfileData(externalProfileData);
     }
   }, [externalProfileData]);
+
+  // 🔹 Hydrate once from localStorage for the latest local snapshot
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('profile') || '{}');
+      if (stored && Object.keys(stored).length) {
+        setProfileData(prev => ({ ...prev, ...stored }));
+      }
+    } catch {}
+  }, []);
+
+  // 🔹 Listen for cross-route updates (workout complete, add friend, save recipe, join challenge)
+  useEffect(() => {
+    const onProfileUpdate = (e) => {
+      if (e?.detail) {
+        setProfileData(prev => ({ ...prev, ...e.detail }));
+      }
+    };
+    window.addEventListener('profile:update', onProfileUpdate);
+    return () => window.removeEventListener('profile:update', onProfileUpdate);
+  }, []);
 
   const displayUser = {
     username: profileData?.username || '',

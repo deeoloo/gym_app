@@ -57,87 +57,115 @@ const CommunitySection = () => {
       .then(res => res.json())
       .then(data => {
         showCommunityMessage(`Joined ${data.challenge.name}`);
-        setProfileData(prev => ({
-          ...prev,
-          communityChallenges: [...prev.communityChallenges, data.challenge]
-        }));
+        setProfileData(prev => {
+          const updated = {
+            ...prev,
+            communityChallenges: [...prev.communityChallenges, data.challenge]
+          };
+          // Persist + broadcast
+          try {
+            const stored = JSON.parse(localStorage.getItem('profile') || '{}');
+            const merged = { ...stored, ...updated };
+            localStorage.setItem('profile', JSON.stringify(merged));
+            window.dispatchEvent(new CustomEvent('profile:update', { detail: merged }));
+          } catch {}
+          return updated;
+        });
       });
   };
 
-const handleAddFriend = (friendId, friendName) => {
-  const suggested = suggestions.find(s => s.id === friendId);
-  const optimisticFriend = {
-    id: friendId,
-    username: friendName,
-    created_at: new Date().toISOString(),
-    ...(suggested ? { mutualFriends: suggested.mutualFriends } : {})
+  const handleAddFriend = (friendId, friendName) => {
+    const suggested = suggestions.find(s => s.id === friendId);
+    const optimisticFriend = {
+      id: friendId,
+      username: friendName,
+      created_at: new Date().toISOString(),
+      ...(suggested ? { mutualFriends: suggested.mutualFriends } : {})
+    };
+
+    // Optimistic add
+    setFriends(prev => (prev.some(f => f.id === friendId) ? prev : [...prev, optimisticFriend]));
+    setProfileData(prev => {
+      const updated = {
+        ...prev,
+        friends: prev.friends.some(f => f.id === friendId) ? prev.friends : [...prev.friends, optimisticFriend],
+      };
+      try {
+        const stored = JSON.parse(localStorage.getItem('profile') || '{}');
+        const merged = { ...stored, ...updated };
+        localStorage.setItem('profile', JSON.stringify(merged));
+        window.dispatchEvent(new CustomEvent('profile:update', { detail: merged }));
+      } catch {}
+      return updated;
+    });
+    setSuggestions(prev => prev.filter(f => f.id !== friendId));
+    showCommunityMessage(`Friend request sent to ${friendName}`);
+
+    // Server call
+    fetch(`/api/friends/${friendId}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    })
+      .then(res => res.json())
+      .then(data => {
+        // 🔹 Merge server response instead of overwriting (keeps optimistic friend)
+        if (Array.isArray(data.friends)) {
+          setFriends(prev => {
+            const byId = new Map(prev.map(f => [f.id, f]));
+            data.friends.forEach(f => byId.set(f.id, f));
+            return Array.from(byId.values());
+          });
+          setProfileData(prev => {
+            const byId = new Map(prev.friends.map(f => [f.id, f]));
+            data.friends.forEach(f => byId.set(f.id, f));
+            const mergedFriends = Array.from(byId.values());
+            const updated = { ...prev, friends: mergedFriends };
+            try {
+              localStorage.setItem('profile', JSON.stringify(updated));
+              window.dispatchEvent(new CustomEvent('profile:update', { detail: updated }));
+            } catch {}
+            return updated;
+          });
+        }
+        if (data.message) showCommunityMessage(data.message);
+      })
+      .catch(err => console.error('Failed to send friend request:', err));
   };
 
-  setFriends(prev => (prev.some(f => f.id === friendId) ? prev : [...prev, optimisticFriend]));
-  setProfileData(prev => {
-    const updated = {
-      ...prev,
-      friends: prev.friends.some(f => f.id === friendId) ? prev.friends : [...prev.friends, optimisticFriend],
-    };
-    // persist + broadcast
-    try {
-      const stored = JSON.parse(localStorage.getItem('profile') || '{}');
-      const merged = { ...stored, ...updated };
-      localStorage.setItem('profile', JSON.stringify(merged));
-      window.dispatchEvent(new CustomEvent('profile:update', { detail: merged }));
-    } catch {}
-    return updated;
-  });
-  setSuggestions(prev => prev.filter(f => f.id !== friendId));
-  showCommunityMessage(`Friend request sent to ${friendName}`);
-
-  fetch(`/api/friends/${friendId}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (Array.isArray(data.friends)) {
-        setFriends(data.friends);
+  const handleRemoveFriend = (friendId) => {
+    fetch(`/api/friends/${friendId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    })
+      .then(res => res.json())
+      .then(data => {
+        showCommunityMessage(data.message || "Friend removed");
+        setFriends(prev => prev.filter(f => f.id !== friendId));
         setProfileData(prev => {
-          const updated = { ...prev, friends: data.friends };
+          const updated = { ...prev, friends: prev.friends.filter(f => f.id !== friendId) };
           try {
             localStorage.setItem('profile', JSON.stringify(updated));
             window.dispatchEvent(new CustomEvent('profile:update', { detail: updated }));
           } catch {}
           return updated;
         });
-      }
-      if (data.message) showCommunityMessage(data.message);
-    })
-    .catch(err => console.error('Failed to send friend request:', err));
-};
-
-
-  const handleRemoveFriend = (friendId) => {
-  fetch(`/api/friends/${friendId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-  })
-    .then(res => res.json())
-    .then(data => {
-      showCommunityMessage(data.message || "Friend removed");
-      setFriends(prev => prev.filter(f => f.id !== friendId));
-      setProfileData(prev => {
-        const updated = { ...prev, friends: prev.friends.filter(f => f.id !== friendId) };
-        try {
-          localStorage.setItem('profile', JSON.stringify(updated));
-          window.dispatchEvent(new CustomEvent('profile:update', { detail: updated }));
-        } catch {}
-        return updated;
-      });
-    })
-    .catch(err => console.error("Failed to remove friend:", err));
-};
-
+      })
+      .catch(err => console.error("Failed to remove friend:", err));
+  };
 
   const isTokenValid = (token) =>
     token && typeof token === 'string' && token.split('.').length === 3;
+
+  // 🔹 Hydrate from localStorage on mount so "Your Friends" persists across reloads
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('profile') || '{}');
+      if (stored?.friends?.length) {
+        setFriends(stored.friends);
+        setProfileData(prev => ({ ...prev, friends: stored.friends }));
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (!isTokenValid(token)) return;
@@ -197,10 +225,16 @@ const handleAddFriend = (friendId, friendName) => {
     })
       .then(res => res.json())
       .then(data => {
-        setFriends(data.friends || []);
+        const serverFriends = data.friends || [];
+        // Merge server friends with any existing optimistic/local ones
+        setFriends(prev => {
+          const byId = new Map(prev.map(f => [f.id, f]));
+          serverFriends.forEach(f => byId.set(f.id, f));
+          return Array.from(byId.values());
+        });
         setProfileData(prev => ({
           ...prev,
-          friends: data.friends || []
+          friends: serverFriends
         }));
       })
       .catch(err => {
@@ -209,7 +243,7 @@ const handleAddFriend = (friendId, friendName) => {
       });
   }, [token]);
 
-   return (
+  return (
     <section className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
       {showMessage && (
         <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-green-800 shadow-sm">
@@ -230,44 +264,43 @@ const handleAddFriend = (friendId, friendName) => {
             <div className="grid gap-4 sm:grid-cols-2">
               {challenges.length === 0 ? (
                 <p className="text-gray-600">No challenges available right now.</p>
-                  ) : (
-                    challenges.map(challenge => (
-                        <div key={challenge.id} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition">
-                            <h4 className="text-lg font-semibold text-gray-800">{challenge.name}</h4>
-                            <p className="text-gray-600 mt-1">{challenge.description}</p>
+              ) : (
+                challenges.map(challenge => (
+                  <div key={challenge.id} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition">
+                    <h4 className="text-lg font-semibold text-gray-800">{challenge.name}</h4>
+                    <p className="text-gray-600 mt-1">{challenge.description}</p>
 
-                      {challenge.target && profileData?.completedWorkouts && (
-                        <div className="mt-4">
-                          <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
-                            <div 
-                              className="h-2 bg-green-500 rounded-full transition-all"
-                              style={{
-                                width: `${Math.min(
-                                  100,
-                                  (profileData.completedWorkouts.length / challenge.target) * 100
-                                )}%`
-                              }}
-                            ></div>
-                          </div>
-                          <span className="mt-2 block text-sm text-gray-700">
-                            {profileData.completedWorkouts.length}/{challenge.target} days
-                          </span>
+                    {challenge.target && profileData?.completedWorkouts && (
+                      <div className="mt-4">
+                        <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                          <div 
+                            className="h-2 bg-green-500 rounded-full transition-all"
+                            style={{
+                              width: `${Math.min(
+                                100,
+                                (profileData.completedWorkouts.length / challenge.target) * 100
+                              )}%`
+                            }}
+                          ></div>
                         </div>
-                      )}
+                        <span className="mt-2 block text-sm text-gray-700">
+                          {profileData.completedWorkouts.length}/{challenge.target} days
+                        </span>
+                      </div>
+                    )}
 
-                      <button
-                        onClick={() => handleJoinChallenge(challenge.id)}
-                        className={`mt-4 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition ${
-                          profileData.communityChallenges.some(c => c.id === challenge.id)
-                            ? 'bg-green-600 text-white shadow'
-                            : 'bg-orange-500 text-white hover:bg-orange-600 shadow'
-                        }`}
-                      >
-                        {profileData.communityChallenges.some(c => c.id === challenge.id)
-                          ? "Joined ✓"
-                          : "Join Challenge"}
-                      </button>
-
+                    <button
+                      onClick={() => handleJoinChallenge(challenge.id)}
+                      className={`mt-4 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                        profileData.communityChallenges.some(c => c.id === challenge.id)
+                          ? 'bg-green-600 text-white shadow'
+                          : 'bg-orange-500 text-white hover:bg-orange-600 shadow'
+                      }`}
+                    >
+                      {profileData.communityChallenges.some(c => c.id === challenge.id)
+                        ? "Joined ✓"
+                        : "Join Challenge"}
+                    </button>
                   </div>
                 ))
               )}
@@ -387,7 +420,7 @@ const handleAddFriend = (friendId, friendName) => {
                     </div>
                     <button
                       onClick={() => handleRemoveFriend(friend.id)}
-                      className="inline-flex items-center justify-center rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white shadow hover:bg-red-600 transition"
+                      className="inline-flex items-center justify-center rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white shadow hover:bg-orange-600 transition"
                     >
                       Remove
                     </button>

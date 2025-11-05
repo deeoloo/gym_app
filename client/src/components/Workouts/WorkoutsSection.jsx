@@ -12,6 +12,7 @@ const WorkoutsSection = () => {
 
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  ̀
   const [showForm, setShowForm] = useState(false);
 
   const [profileData, setProfileData] = useState({
@@ -54,32 +55,31 @@ const WorkoutsSection = () => {
   }, []);
 
   const completeWorkout = (workout) => {
-  if (!profileData.completedWorkouts.includes(workout.id)) {
-    setProfileData((prev) => {
-      const updated = {
-        ...prev,
-        completedWorkouts: [...prev.completedWorkouts, workout.id],
-        completedWorkoutDetails: [
-          ...prev.completedWorkoutDetails,
-          {
-            id: workout.id,
-            name: workout.name,
-            date: new Date().toISOString(),
-          },
-        ],
-      };
-      // persist + broadcast
-      try {
-        const stored = JSON.parse(localStorage.getItem('profile') || '{}');
-        const merged = { ...stored, ...updated };
-        localStorage.setItem('profile', JSON.stringify(merged));
-        window.dispatchEvent(new CustomEvent('profile:update', { detail: merged }));
-      } catch {}
-      return updated;
-    });
-  }
-};
-
+    if (!profileData.completedWorkouts.includes(workout.id)) {
+      setProfileData((prev) => {
+        const updated = {
+          ...prev,
+          completedWorkouts: [...prev.completedWorkouts, workout.id],
+          completedWorkoutDetails: [
+            ...prev.completedWorkoutDetails,
+            {
+              id: workout.id,
+              name: workout.name,
+              date: new Date().toISOString(),
+            },
+          ],
+        };
+        // persist + broadcast
+        try {
+          const stored = JSON.parse(localStorage.getItem('profile') || '{}');
+          const merged = { ...stored, ...updated };
+          localStorage.setItem('profile', JSON.stringify(merged));
+          window.dispatchEvent(new CustomEvent('profile:update', { detail: merged }));
+        } catch {}
+        return updated;
+      });
+    }
+  };
 
   const handleDeleteWorkout = async (id) => {
     if (!window.confirm('Delete this workout?')) return;
