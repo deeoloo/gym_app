@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 
-const ProfileSection = () => {
-  const { user, token } = useContext(AuthContext);
+const ProfileSection = ({ externalProfileData }) => {
+  const { user } = useContext(AuthContext);
+
   const [profileData, setProfileData] = useState({
     completedWorkouts: [],
     completedWorkoutDetails: [],
@@ -14,6 +15,25 @@ const ProfileSection = () => {
     email: user?.email || '',
     avatar: user?.avatar || '👤',
   });
+
+  // Hydrate/refresh local state whenever new external data arrives
+  useEffect(() => {
+    if (!externalProfileData) return;
+    setProfileData(prev => ({
+      ...prev,
+      ...externalProfileData,
+      // Fallbacks to keep shapes stable
+      completedWorkouts: externalProfileData.completedWorkouts ?? prev.completedWorkouts ?? [],
+      completedWorkoutDetails: externalProfileData.completedWorkoutDetails ?? prev.completedWorkoutDetails ?? [],
+      communityChallenges: externalProfileData.communityChallenges ?? prev.communityChallenges ?? [],
+      friends: externalProfileData.friends ?? prev.friends ?? [],
+      posts: externalProfileData.posts ?? prev.posts ?? [],
+      savedRecipes: externalProfileData.savedRecipes ?? prev.savedRecipes ?? [],
+      username: externalProfileData.username ?? prev.username ?? '',
+      email: externalProfileData.email ?? prev.email ?? '',
+      avatar: externalProfileData.avatar ?? prev.avatar ?? '👤',
+    }));
+  }, [externalProfileData]);
 
   const displayUser = {
     username: profileData.username,
@@ -42,7 +62,7 @@ const ProfileSection = () => {
     })),
     ...profileData.posts.slice(-1).map(post => ({
       type: 'post',
-      text: `Posted: "${post.content.substring(0, 20)}..."`,
+      text: `Posted: "${(post.content || '').substring(0, 20)}..."`,
       icon: '💬',
       date: post.time
     })),
@@ -62,9 +82,11 @@ const ProfileSection = () => {
           <div className="text-6xl mr-4 bg-green-100 text-green-600 rounded-full p-4">
             {displayUser.avatar}
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-green-800">{displayUser.username || 'User'}</h2>
-            <p className="text-gray-600">{displayUser.email || ''}</p>
+          <div className="min-w-0">
+            <h2 className="text-2xl font-bold text-green-800 break-words">
+              {displayUser.username || 'User'}
+            </h2>
+            <p className="text-gray-600 break-words">{displayUser.email || ''}</p>
           </div>
         </div>
 
@@ -90,23 +112,35 @@ const ProfileSection = () => {
 
         {/* Activity */}
         <div className="mb-10">
-          <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">Recent Activity</h3>
+          <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">
+            Recent Activity
+          </h3>
           <div className="space-y-4">
             {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-start bg-gray-50 hover:bg-green-50 rounded-lg p-4 shadow-sm transition">
+              <div
+                key={index}
+                className="flex items-start bg-gray-50 hover:bg-green-50 rounded-lg p-4 shadow-sm transition"
+              >
                 <span className="text-3xl mr-3">{activity.icon}</span>
-                <div>
-                  <p className="text-gray-800">{activity.text}</p>
-                  <p className="text-sm text-gray-600">{new Date(activity.date).toLocaleString()}</p>
+                <div className="min-w-0">
+                  <p className="text-gray-800 break-words">{activity.text}</p>
+                  <p className="text-sm text-gray-600">
+                    {new Date(activity.date).toLocaleString()}
+                  </p>
                 </div>
               </div>
             ))}
+            {recentActivities.length === 0 && (
+              <p className="text-gray-600">No recent activity yet.</p>
+            )}
           </div>
         </div>
 
         {/* Achievements */}
         <div>
-          <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">Achievements</h3>
+          <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">
+            Achievements
+          </h3>
           <div className="grid sm:grid-cols-2 gap-6">
             <div
               className={`rounded-xl p-6 text-center border-2 transition ${
@@ -119,7 +153,7 @@ const ProfileSection = () => {
               <div>
                 {profileData.completedWorkouts.length >= 5
                   ? 'Completed!'
-                  : `${5 - profileData.completedWorkouts.length} to go`}
+                  : `${Math.max(0, 5 - profileData.completedWorkouts.length)} to go`}
               </div>
             </div>
 

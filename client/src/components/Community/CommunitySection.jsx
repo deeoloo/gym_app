@@ -379,7 +379,7 @@ const CommunitySection = () => {
                     </div>
                     <button
                       onClick={() => handleRemoveFriend(friend.id)}
-                      className="inline-flex items-center justify-center rounded-lg bg-red-500 px-3 py-1.5 text-sm font-semibold text-white shadow hover:bg-red-600 transition"
+                      className="inline-flex items-center justify-center rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white shadow hover:bg-red-600 transition"
                     >
                       Remove
                     </button>
