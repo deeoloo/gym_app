@@ -40,7 +40,7 @@ const Dashboard = () => {
   }, [token, logout]);
 
   return (
-    <div className="min-h-screen bg-green-50">
+    <div className="min-h-screen bg-green-50 text-gray-800">
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <div className="text-center mb-8">
@@ -53,13 +53,11 @@ const Dashboard = () => {
         </div>
 
         {/* Profile Section */}
-        {/*<div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">*/}
-          {loadingProfile ? (
-            <p className="text-center text-gray-600 italic">Loading profile...</p>
-          ) : (
-            <ProfileSection externalProfileData={profileData} />
-          )}
-        {/*</div>*/}
+        {loadingProfile ? (
+          <p className="text-center text-gray-600 italic">Loading profile...</p>
+        ) : (
+          <ProfileSection externalProfileData={profileData} />
+        )}
 
         {/* Quick Access */}
         <section className="mt-10">
@@ -69,7 +67,7 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
-              className="cursor-pointer bg-white rounded-xl shadow-md border border-gray-100 p-6 transition hover:-translate-y-0.5 hover:shadow-lg hover:bg-orange-50/60 border-l-4 border-orange-400"
+              className="cursor-pointer bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition duration-300 hover:bg-orange-50 hover:-translate-y-0.5 border-l-4 border-orange-400"
               onClick={() => navigate('/workouts')}
             >
               <h3 className="text-lg font-bold text-green-800">🏋️ Workouts</h3>
@@ -79,7 +77,7 @@ const Dashboard = () => {
             </div>
 
             <div
-              className="cursor-pointer bg-white rounded-xl shadow-md border border-gray-100 p-6 transition hover:-translate-y-0.5 hover:shadow-lg hover:bg-orange-50/60 border-l-4 border-orange-400"
+              className="cursor-pointer bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition duration-300 hover:bg-orange-50 hover:-translate-y-0.5 border-l-4 border-orange-400"
               onClick={() => navigate('/nutrition')}
             >
               <h3 className="text-lg font-bold text-green-800">🥗 Nutrition</h3>
@@ -89,7 +87,7 @@ const Dashboard = () => {
             </div>
 
             <div
-              className="cursor-pointer bg-white rounded-xl shadow-md border border-gray-100 p-6 transition hover:-translate-y-0.5 hover:shadow-lg hover:bg-orange-50/60 border-l-4 border-orange-400"
+              className="cursor-pointer bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition duration-300 hover:bg-orange-50 hover:-translate-y-0.5 border-l-4 border-orange-400"
               onClick={() => navigate('/products')}
             >
               <h3 className="text-lg font-bold text-green-800">🛍️ Products</h3>
@@ -99,7 +97,7 @@ const Dashboard = () => {
             </div>
 
             <div
-              className="cursor-pointer bg-white rounded-xl shadow-md border border-gray-100 p-6 transition hover:-translate-y-0.5 hover:shadow-lg hover:bg-orange-50/60 border-l-4 border-orange-400"
+              className="cursor-pointer bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition duration-300 hover:bg-orange-50 hover:-translate-y-0.5 border-l-4 border-orange-400"
               onClick={() => navigate('/community')}
             >
               <h3 className="text-lg font-bold text-green-800">💬 Community</h3>
