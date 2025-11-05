@@ -1,3 +1,4 @@
+// src/components/Workouts/WorkoutsSection.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import Card from '../Card';
 import LoadingSpinner from '../LoadingSpinner';
@@ -12,7 +13,6 @@ const WorkoutsSection = () => {
 
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  ̀
   const [showForm, setShowForm] = useState(false);
 
   const [profileData, setProfileData] = useState({
@@ -75,7 +75,7 @@ const WorkoutsSection = () => {
           const merged = { ...stored, ...updated };
           localStorage.setItem('profile', JSON.stringify(merged));
           window.dispatchEvent(new CustomEvent('profile:update', { detail: merged }));
-        } catch {}
+        } catch { /* noop */ }
         return updated;
       });
     }
@@ -107,7 +107,13 @@ const WorkoutsSection = () => {
     );
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <div className="mx-auto max-w-5xl my-6 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">Error: {error}</div>;
+  if (error) {
+    return (
+      <div className="mx-auto max-w-5xl my-6 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
+        Error: {error}
+      </div>
+    );
+  }
 
   return (
     <section className="mx-auto max-w-5xl px-4 sm:px-6 py-8">

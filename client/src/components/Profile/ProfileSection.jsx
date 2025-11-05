@@ -86,7 +86,7 @@ const ProfileSection = ({ externalProfileData }) => {
   ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
-    <section className="min-h-screen bg-green-50 text-gray-800 flex justify-center items-start py-10 px-4">
+    <section className="min-h-screen bg-green-50 text-gray-800 flex justify-center items-start py-4 px-8">
       <div className="bg-white w-full max-w-3xl rounded-2xl shadow-md p-8">
         {/* Header */}
         <div className="flex items-center border-b border-gray-200 pb-6 mb-6">
