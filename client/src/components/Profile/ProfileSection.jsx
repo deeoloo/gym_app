@@ -18,14 +18,14 @@ const ProfileSection = ({ externalProfileData }) => {
     }
   );
 
-  // Apply server data when it arrives (Dashboard fetch)
+  // ✅ MERGE (don't replace) so local updates aren't wiped by partial server payloads
   useEffect(() => {
     if (externalProfileData) {
-      setProfileData(externalProfileData);
+      setProfileData(prev => ({ ...prev, ...externalProfileData }));
     }
   }, [externalProfileData]);
 
-  // 🔹 Hydrate once from localStorage for the latest local snapshot
+  // Hydrate from localStorage
   useEffect(() => {
     try {
       const stored = JSON.parse(localStorage.getItem('profile') || '{}');
@@ -35,7 +35,7 @@ const ProfileSection = ({ externalProfileData }) => {
     } catch {}
   }, []);
 
-  // 🔹 Listen for cross-route updates (workout complete, add friend, save recipe, join challenge)
+  // Listen for cross-route updates
   useEffect(() => {
     const onProfileUpdate = (e) => {
       if (e?.detail) {
@@ -86,7 +86,7 @@ const ProfileSection = ({ externalProfileData }) => {
   ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
-    <section className="min-h-screen bg-green-50 text-gray-800 flex justify-center items-start py-4 px-8">
+    <section className="min-h-screen bg-green-50 text-gray-800 flex justify-center items-start py-10 px-4">
       <div className="bg-white w-full max-w-3xl rounded-2xl shadow-md p-8">
         {/* Header */}
         <div className="flex items-center border-b border-gray-200 pb-6 mb-6">
