@@ -64,69 +64,77 @@ const CommunitySection = () => {
       });
   };
 
-  // ✅ Updated: instantly add to "Your Friends", then sync with server response
-  const handleAddFriend = (friendId, friendName) => {
-    const suggested = suggestions.find(s => s.id === friendId);
-
-    // Optimistic friend object
-    const optimisticFriend = {
-      id: friendId,
-      username: friendName,
-      created_at: new Date().toISOString(),
-      ...(suggested ? { mutualFriends: suggested.mutualFriends } : {})
-    };
-
-    // Optimistic UI updates
-    setFriends(prev => (prev.some(f => f.id === friendId) ? prev : [...prev, optimisticFriend]));
-    setProfileData(prev => ({
-      ...prev,
-      friends: prev.friends.some(f => f.id === friendId) ? prev.friends : [...prev.friends, optimisticFriend]
-    }));
-    setSuggestions(prev => prev.filter(f => f.id !== friendId));
-    showCommunityMessage(`Friend request sent to ${friendName}`);
-
-    // Server call
-    fetch(`/api/friends/${friendId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        // If API returns canonical friends list, sync state with it
-        if (Array.isArray(data.friends)) {
-          setFriends(data.friends);
-          setProfileData(prev => ({ ...prev, friends: data.friends }));
-        }
-        if (data.message) {
-          showCommunityMessage(data.message);
-        }
-      })
-      .catch(err => {
-        console.error("Failed to send friend request:", err);
-        // Optional: rollback optimistic add on hard failure (comment out to keep optimistic)
-        // setFriends(prev => prev.filter(f => f.id !== friendId));
-        // setProfileData(prev => ({ ...prev, friends: prev.friends.filter(f => f.id !== friendId) }));
-      });
+const handleAddFriend = (friendId, friendName) => {
+  const suggested = suggestions.find(s => s.id === friendId);
+  const optimisticFriend = {
+    id: friendId,
+    username: friendName,
+    created_at: new Date().toISOString(),
+    ...(suggested ? { mutualFriends: suggested.mutualFriends } : {})
   };
+
+  setFriends(prev => (prev.some(f => f.id === friendId) ? prev : [...prev, optimisticFriend]));
+  setProfileData(prev => {
+    const updated = {
+      ...prev,
+      friends: prev.friends.some(f => f.id === friendId) ? prev.friends : [...prev.friends, optimisticFriend],
+    };
+    // persist + broadcast
+    try {
+      const stored = JSON.parse(localStorage.getItem('profile') || '{}');
+      const merged = { ...stored, ...updated };
+      localStorage.setItem('profile', JSON.stringify(merged));
+      window.dispatchEvent(new CustomEvent('profile:update', { detail: merged }));
+    } catch {}
+    return updated;
+  });
+  setSuggestions(prev => prev.filter(f => f.id !== friendId));
+  showCommunityMessage(`Friend request sent to ${friendName}`);
+
+  fetch(`/api/friends/${friendId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (Array.isArray(data.friends)) {
+        setFriends(data.friends);
+        setProfileData(prev => {
+          const updated = { ...prev, friends: data.friends };
+          try {
+            localStorage.setItem('profile', JSON.stringify(updated));
+            window.dispatchEvent(new CustomEvent('profile:update', { detail: updated }));
+          } catch {}
+          return updated;
+        });
+      }
+      if (data.message) showCommunityMessage(data.message);
+    })
+    .catch(err => console.error('Failed to send friend request:', err));
+};
+
 
   const handleRemoveFriend = (friendId) => {
-    fetch(`/api/friends/${friendId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+  fetch(`/api/friends/${friendId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(data => {
+      showCommunityMessage(data.message || "Friend removed");
+      setFriends(prev => prev.filter(f => f.id !== friendId));
+      setProfileData(prev => {
+        const updated = { ...prev, friends: prev.friends.filter(f => f.id !== friendId) };
+        try {
+          localStorage.setItem('profile', JSON.stringify(updated));
+          window.dispatchEvent(new CustomEvent('profile:update', { detail: updated }));
+        } catch {}
+        return updated;
+      });
     })
-      .then(res => res.json())
-      .then(data => {
-        showCommunityMessage(data.message || "Friend removed");
-        setFriends(prev => prev.filter(f => f.id !== friendId));
-      })
-      .catch(err => console.error("Failed to remove friend:", err));
-  };
+    .catch(err => console.error("Failed to remove friend:", err));
+};
+
 
   const isTokenValid = (token) =>
     token && typeof token === 'string' && token.split('.').length === 3;
