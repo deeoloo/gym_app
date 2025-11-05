@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 
 const ProfileSection = () => {
-  const { user, token } = useContext(AuthContext); 
+  const { user, token } = useContext(AuthContext);
   const [profileData, setProfileData] = useState({
     completedWorkouts: [],
     completedWorkoutDetails: [],
@@ -55,66 +55,83 @@ const ProfileSection = () => {
   ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
-    <section className="profile-section">
-      <div className="profile-card">
-        <div className="profile-header">
-          <div className="flex items-center">
-            <div className="profile-avatar">{displayUser.avatar}</div>
-            <div>
-              <h2 className="profile-name">{displayUser.username || 'User'}</h2>
-              <p className="profile-email">{displayUser.email || ''}</p>
-            </div>
+    <section className="min-h-screen bg-green-50 text-gray-800 flex justify-center items-start py-10 px-4">
+      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-md p-8">
+        {/* Header */}
+        <div className="flex items-center border-b border-gray-200 pb-6 mb-6">
+          <div className="text-6xl mr-4 bg-green-100 text-green-600 rounded-full p-4">
+            {displayUser.avatar}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-green-800">{displayUser.username || 'User'}</h2>
+            <p className="text-gray-600">{displayUser.email || ''}</p>
           </div>
         </div>
 
-        <div className="profile-stats">
-          <div className="stat-card">
-            <div className="stat-value">{profileData.completedWorkouts.length}</div>
-            <div className="stat-label">Workouts</div>
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-10">
+          <div className="bg-green-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
+            <div className="text-2xl font-bold text-green-700">{profileData.completedWorkouts.length}</div>
+            <div className="text-gray-700">Workouts</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-value">{profileData.communityChallenges.length}</div>
-            <div className="stat-label">Challenges</div>
+          <div className="bg-blue-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
+            <div className="text-2xl font-bold text-blue-700">{profileData.communityChallenges.length}</div>
+            <div className="text-gray-700">Challenges</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-value">{profileData.friends.length}</div>
-            <div className="stat-label">Friends</div>
+          <div className="bg-purple-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
+            <div className="text-2xl font-bold text-purple-700">{profileData.friends.length}</div>
+            <div className="text-gray-700">Friends</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-value">{profileData.savedRecipes.length}</div>
-            <div className="stat-label">Nutrition</div>
+          <div className="bg-yellow-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
+            <div className="text-2xl font-bold text-yellow-700">{profileData.savedRecipes.length}</div>
+            <div className="text-gray-700">Nutrition</div>
           </div>
         </div>
 
-        <div className="activity">
-          <h3 className="section-subtitle">Recent Activity</h3>
-          <div className="activity-list">
+        {/* Activity */}
+        <div className="mb-10">
+          <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">Recent Activity</h3>
+          <div className="space-y-4">
             {recentActivities.map((activity, index) => (
-              <div key={index} className="activity-item">
-                <span className="activity-icon">{activity.icon}</span>
+              <div key={index} className="flex items-start bg-gray-50 hover:bg-green-50 rounded-lg p-4 shadow-sm transition">
+                <span className="text-3xl mr-3">{activity.icon}</span>
                 <div>
-                  <p>{activity.text}</p>
-                  <p className="activity-date">{activity.date}</p>
+                  <p className="text-gray-800">{activity.text}</p>
+                  <p className="text-sm text-gray-600">{new Date(activity.date).toLocaleString()}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Achievements */}
         <div>
-          <h3 className="section-subtitle">Achievements</h3>
-          <div className="achievements-grid">
-            <div className={`achievement-card ${profileData.completedWorkouts.length >= 5 ? 'completed' : ''}`}>
-              <div className="achievement-title">Workouts</div>
-              <div className="achievement-status">
+          <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">Achievements</h3>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div
+              className={`rounded-xl p-6 text-center border-2 transition ${
+                profileData.completedWorkouts.length >= 5
+                  ? 'border-green-600 bg-green-100 text-green-700'
+                  : 'border-gray-200 bg-white text-gray-700'
+              }`}
+            >
+              <div className="text-lg font-semibold mb-1">Workouts</div>
+              <div>
                 {profileData.completedWorkouts.length >= 5
                   ? 'Completed!'
                   : `${5 - profileData.completedWorkouts.length} to go`}
               </div>
             </div>
-            <div className={`achievement-card ${profileData.communityChallenges.length >= 1 ? 'completed' : ''}`}>
-              <div className="achievement-title">Challenge</div>
-              <div className="achievement-status">
+
+            <div
+              className={`rounded-xl p-6 text-center border-2 transition ${
+                profileData.communityChallenges.length >= 1
+                  ? 'border-orange-500 bg-orange-100 text-orange-700'
+                  : 'border-gray-200 bg-white text-gray-700'
+              }`}
+            >
+              <div className="text-lg font-semibold mb-1">Challenge</div>
+              <div>
                 {profileData.communityChallenges.length >= 1 ? 'Completed!' : 'Not started'}
               </div>
             </div>
