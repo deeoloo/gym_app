@@ -64,7 +64,28 @@ const CommunitySection = () => {
       });
   };
 
+  // ✅ Updated: instantly add to "Your Friends", then sync with server response
   const handleAddFriend = (friendId, friendName) => {
+    const suggested = suggestions.find(s => s.id === friendId);
+
+    // Optimistic friend object
+    const optimisticFriend = {
+      id: friendId,
+      username: friendName,
+      created_at: new Date().toISOString(),
+      ...(suggested ? { mutualFriends: suggested.mutualFriends } : {})
+    };
+
+    // Optimistic UI updates
+    setFriends(prev => (prev.some(f => f.id === friendId) ? prev : [...prev, optimisticFriend]));
+    setProfileData(prev => ({
+      ...prev,
+      friends: prev.friends.some(f => f.id === friendId) ? prev.friends : [...prev.friends, optimisticFriend]
+    }));
+    setSuggestions(prev => prev.filter(f => f.id !== friendId));
+    showCommunityMessage(`Friend request sent to ${friendName}`);
+
+    // Server call
     fetch(`/api/friends/${friendId}`, {
       method: 'POST',
       headers: {
@@ -74,14 +95,21 @@ const CommunitySection = () => {
     })
       .then(res => res.json())
       .then(data => {
-        showCommunityMessage(data.message || `Friend request sent to ${friendName}`);
-        setProfileData(prev => ({
-          ...prev,
-          friends: data.friends || []
-        }));
-        setSuggestions(prev => prev.filter(f => f.id !== friendId));
+        // If API returns canonical friends list, sync state with it
+        if (Array.isArray(data.friends)) {
+          setFriends(data.friends);
+          setProfileData(prev => ({ ...prev, friends: data.friends }));
+        }
+        if (data.message) {
+          showCommunityMessage(data.message);
+        }
       })
-      .catch(err => console.error("Failed to send friend request:", err));
+      .catch(err => {
+        console.error("Failed to send friend request:", err);
+        // Optional: rollback optimistic add on hard failure (comment out to keep optimistic)
+        // setFriends(prev => prev.filter(f => f.id !== friendId));
+        // setProfileData(prev => ({ ...prev, friends: prev.friends.filter(f => f.id !== friendId) }));
+      });
   };
 
   const handleRemoveFriend = (friendId) => {
