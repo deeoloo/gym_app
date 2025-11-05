@@ -53,13 +53,13 @@ const Dashboard = () => {
         </div>
 
         {/* Profile Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
+        {/*<div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">*/}
           {loadingProfile ? (
             <p className="text-center text-gray-600 italic">Loading profile...</p>
           ) : (
             <ProfileSection externalProfileData={profileData} />
           )}
-        </div>
+        {/*</div>*/}
 
         {/* Quick Access */}
         <section className="mt-10">
