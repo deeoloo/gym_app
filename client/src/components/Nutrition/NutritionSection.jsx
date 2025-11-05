@@ -71,7 +71,7 @@ const NutritionSection = () => {
         savedRecipes: prev.savedRecipes.filter(recipe => recipe.id !== id)
       }));
 
-      fetchNutrition(); 
+      fetchNutrition();
     } catch (err) {
       console.error('Delete error:', err);
       alert('Error deleting nutrition');
@@ -114,30 +114,41 @@ const NutritionSection = () => {
   );
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <div className="error-message">Error: {error}</div>;
+  if (error)
+    return (
+      <div className="mx-auto max-w-5xl my-6 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
+        Error: {error}
+      </div>
+    );
 
   return (
-    <section className="p-6">
-      <h2 className="section-title">Nutrition</h2>
+    <section className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+      <h2 className="text-2xl sm:text-3xl font-extrabold text-green-800 mb-4">
+        Nutrition
+      </h2>
 
       <h2
-        className="link-heading"
+        className="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold cursor-pointer mb-4"
         onClick={() => setShowForm(prev => !prev)}
       >
         {showForm ? 'Hide Form' : 'Add Nutrition'}
       </h2>
 
-      {showForm && <NutritionForm onCreated={fetchNutrition} />}
+      {showForm && (
+        <div className="mb-6">
+          <NutritionForm onCreated={fetchNutrition} />
+        </div>
+      )}
 
       <input
         type="text"
         placeholder="Search recipes..."
-        className="search-input mb-6"
+        className="w-full mb-6 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredPlans.length > 0 ? (
           filteredPlans.map(plan => (
             <Card
@@ -151,7 +162,9 @@ const NutritionSection = () => {
             />
           ))
         ) : (
-          <div>No nutrition plans found.</div>
+          <div className="col-span-full rounded-xl border border-gray-200 bg-white text-gray-700 shadow-sm p-6 text-center">
+            No nutrition plans found.
+          </div>
         )}
       </div>
     </section>

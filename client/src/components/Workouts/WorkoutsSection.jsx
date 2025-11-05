@@ -69,7 +69,7 @@ const WorkoutsSection = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (res.ok) fetchWorkouts(); 
+      if (res.ok) fetchWorkouts();
       else alert('Failed to delete');
     } catch {
       alert('Error deleting workout');
@@ -81,47 +81,58 @@ const WorkoutsSection = () => {
       activeFilter === 'all' || workout.category === activeFilter
     )
     .filter(workout =>
-      workout.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      workout.description.toLowerCase().includes(searchTerm.toLowerCase())
+      (workout.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (workout.description || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <div className="error-message">Error: {error}</div>;
+  if (error) return <div className="mx-auto max-w-5xl my-6 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">Error: {error}</div>;
 
   return (
-    <section className="workouts-section">
-      <h2 className="section-title">Workouts</h2>
+    <section className="mx-auto max-w-5xl px-4 sm:px-6 py-8">
+      <h2 className="text-2xl sm:text-3xl font-extrabold text-green-800 mb-4">Workouts</h2>
 
       <h3
-        className="link-heading"
+        className="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold cursor-pointer mb-4"
         onClick={() => setShowForm(prev => !prev)}
       >
         {showForm ? 'Hide Form' : 'Add Workout'}
       </h3>
-      {showForm && <WorkoutForm onCreated={fetchWorkouts} />}
+
+      {showForm && (
+        <div className="mb-6">
+          <WorkoutForm onCreated={fetchWorkouts} />
+        </div>
+      )}
 
       {/* Search Bar */}
-      <div className="search-container">
+      <div className="mb-6">
         <input
           type="text"
           placeholder="Search workouts..."
-          className="search-input"
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
       {/* Category Filters */}
-      <div className="filters-container">
+      <div className="flex items-center gap-3 mb-6">
         <button
-          className={`filter-button ${activeFilter === 'all' ? 'active' : ''}`}
+          className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold transition border ${
+            activeFilter === 'all'
+              ? 'bg-green-600 text-white border-green-600 shadow'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-green-50'
+          }`}
           onClick={() => setActiveFilter('all')}
         >
           All
         </button>
+        {/* Add more filters here later, reusing the same style */}
       </div>
 
-      <div className="workout-list">
+      {/* Workouts List */}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {filteredWorkouts.map(workout => (
           <Card
             key={workout.id}
