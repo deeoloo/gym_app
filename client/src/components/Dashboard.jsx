@@ -52,7 +52,7 @@ const Dashboard = () => {
       </div>
 
       {/* Profile Section */}
-      <section className="mb-10">
+      <section>
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
           {loadingProfile ? (
             <p className="text-center text-gray-600 italic">Loading profile...</p>
