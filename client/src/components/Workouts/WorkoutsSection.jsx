@@ -23,6 +23,16 @@ const WorkoutsSection = () => {
     savedRecipes: [],
   });
 
+  // Hydrate profile snapshot from localStorage (so completed flags persist)
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('profile') || '{}');
+      if (stored && Object.keys(stored).length) {
+        setProfileData(prev => ({ ...prev, ...stored }));
+      }
+    } catch { /* noop */ }
+  }, []);
+
   // ✅ Fetch workouts manually
   const fetchWorkouts = async () => {
     setLoading(true);
@@ -45,18 +55,30 @@ const WorkoutsSection = () => {
 
   const completeWorkout = (workout) => {
     if (!profileData.completedWorkouts.includes(workout.id)) {
-      setProfileData((prev) => ({
-        ...prev,
-        completedWorkouts: [...prev.completedWorkouts, workout.id],
-        completedWorkoutDetails: [
-          ...prev.completedWorkoutDetails,
-          {
-            id: workout.id,
-            name: workout.name,
-            date: new Date().toISOString(),
-          },
-        ],
-      }));
+      setProfileData((prev) => {
+        const updated = {
+          ...prev,
+          completedWorkouts: [...prev.completedWorkouts, workout.id],
+          completedWorkoutDetails: [
+            ...prev.completedWorkoutDetails,
+            {
+              id: workout.id,
+              name: workout.name,
+              date: new Date().toISOString(),
+            },
+          ],
+        };
+
+        // Persist a compact profile snapshot and broadcast to listeners (e.g., ProfileSection)
+        try {
+          const stored = JSON.parse(localStorage.getItem('profile') || '{}');
+          const merged = { ...stored, ...updated };
+          localStorage.setItem('profile', JSON.stringify(merged));
+          window.dispatchEvent(new CustomEvent('profile:update', { detail: merged }));
+        } catch { /* noop */ }
+
+        return updated;
+      });
     }
   };
 
