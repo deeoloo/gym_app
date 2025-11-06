@@ -139,7 +139,7 @@ const ProfileSection = ({ externalProfileData }) => {
               recentActivities.map((activity, index) => (
                 <div
                   key={index}
-                  className="flex items-start bg-gray-50 hover:bg-green-50 rounded-lg p-4 shadow-sm transition"
+                  className="flex items-start bg-green-100 hover:bg-green-50 rounded-lg p-4 shadow-sm transition"
                 >
                   <span className="text-3xl mr-3">{activity.icon}</span>
                   <div className="min-w-0">
