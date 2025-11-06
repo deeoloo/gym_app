@@ -15,6 +15,7 @@ def create_workout():
     
     try:
         workout = Workout(
+            video_url=data('video_url'),
             name=data['name'],
             description=data.get('description', ''),
             duration=data['duration'],
@@ -52,6 +53,7 @@ def workout_detail(workout_id):
     elif request.method == 'PUT':
         data = request.get_json()
         try:
+            if 'video_url' in data: workout.video_url = data['video_url']
             if 'name' in data: workout.name = data['name']
             if 'description' in data: workout.description = data['description']
             if 'duration' in data: workout.duration = data['duration']

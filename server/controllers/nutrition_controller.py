@@ -32,6 +32,7 @@ def get_nutrition_plans():
             'plans': [{
                 'id': p.id,
                 'name': p.name,
+                'image_url': p.image_url,
                 'description': p.description,
                 'calories': p.calories,
                 'protein': p.protein,
@@ -66,6 +67,7 @@ def get_user_nutrition_plans():
         return jsonify([{
             'id': p.id,
             'name': p.name,
+            'image_url': p.image_url,
             'description': p.description,
             'calories': p.calories,
             'protein': p.protein,
@@ -90,6 +92,7 @@ def create_nutrition_plan():
     try:
         plan = NutritionPlan(
             name=data['name'],
+            image_url=data['image_url'],
             description=data.get('description', ''),
             calories=data['calories'],
             protein=data['protein'],
@@ -105,6 +108,7 @@ def create_nutrition_plan():
             'plan': {
                 'id': plan.id,
                 'name': plan.name,
+                'image_url': plan.image_url,
                 'calories': plan.calories
             }
         }), 201
@@ -123,6 +127,7 @@ def get_nutrition_plan(plan_id):
         return jsonify({
             'id': plan.id,
             'name': plan.name,
+            'image_url': plan.image_url,
             'description': plan.description,
             'calories': plan.calories,
             'protein': plan.protein,
@@ -172,6 +177,7 @@ def update_nutrition_plan(plan_id):
     data = request.get_json()
     try:
         if 'name' in data: plan.name = data['name']
+        if 'image_url' in data: plan.image_url = data['image_url']
         if 'description' in data: plan.description = data['description']
         if 'calories' in data: plan.calories = data['calories']
         if 'protein' in data: plan.protein = data['protein']

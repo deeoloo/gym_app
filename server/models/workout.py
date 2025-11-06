@@ -7,6 +7,7 @@ class Workout(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    video_url = db.Column(db.String)
     description = db.Column(db.Text)
     difficulty = db.Column(db.String)
     duration = db.Column(db.Integer, nullable=False) 
@@ -20,7 +21,7 @@ class Workout(db.Model, SerializerMixin):
 
     
     def __repr__(self):
-        return f'Workout{self.name} {self.description} {self.difficulty}'
+        return f'Workout{self.name} {self.description} {self.video_url} {self.difficulty}'
     
 
     def to_dict(self):
@@ -28,6 +29,7 @@ class Workout(db.Model, SerializerMixin):
             'id': self.id,
             'name': self.name,
             'description': self.description,
+            'video_url': self.video_url,
             'difficulty': self.difficulty,
             'duration': self.duration,
             'exercises': self.exercises,

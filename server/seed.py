@@ -61,6 +61,7 @@ def seed_workouts(users, num_workouts=8):
     for _ in range(num_workouts):
         user = random.choice(users)
         workout = Workout(
+            video_url=fake.url(),
             name=f"{random.choice(workout_types)} Session",
             description=fake.sentence(),
             difficulty=random.choice(difficulties),
@@ -181,6 +182,7 @@ def seed_nutrition_plans(users, num_plans=50):
         user = random.choice(users)
         plan = NutritionPlan(
             name=f"{random.choice(['Lean', 'Bulk', 'Keto', 'Vegan'])} {random.choice(['Meal', 'Plan', 'Nutrition'])}",
+            image_url=fake.image_url(),
             description=fake.paragraph(),
             calories=random.randint(1200, 3000),
             protein=random.randint(50, 200),
