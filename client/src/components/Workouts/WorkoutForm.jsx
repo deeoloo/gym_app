@@ -14,10 +14,9 @@ const WorkoutForm = ({ onCreated }) => {
     duration: '',
     difficulty: '',
     exercises: '',
-    // 👇 new: allow manual public_id/url
     video_url: '',
   });
-  const [videoFile, setVideoFile] = useState(null); // 👈 new: optional file
+  const [videoFile, setVideoFile] = useState(null); 
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +30,6 @@ const WorkoutForm = ({ onCreated }) => {
     setVideoFile(file);
   };
 
-  // Upload to Cloudinary if a file is selected; return public_id
   const uploadVideoIfNeeded = async () => {
     if (!videoFile) return null;
 
@@ -39,7 +37,7 @@ const WorkoutForm = ({ onCreated }) => {
     const body = new FormData();
     body.append('file', videoFile);
     body.append('upload_preset', UPLOAD_PRESET);
-    body.append('folder', WORKOUTS_FOLDER); // keep all workout videos under /workouts
+    body.append('folder', WORKOUTS_FOLDER);
 
     const res = await fetch(url, { method: 'POST', body });
     if (!res.ok) {
@@ -47,7 +45,6 @@ const WorkoutForm = ({ onCreated }) => {
       throw new Error(`Cloudinary upload failed: ${res.status} ${errText}`);
     }
     const json = await res.json();
-    // Prefer public_id (e.g., "workouts/squats-level1"); secure_url also available if needed
     return json.public_id || null;
   };
 
@@ -57,19 +54,19 @@ const WorkoutForm = ({ onCreated }) => {
     setMessage('');
 
     try {
-      // 1) Upload video file (if provided) to get public_id
+      
       let finalVideoId = formData.video_url?.trim() || '';
       if (videoFile) {
         const uploadedPublicId = await uploadVideoIfNeeded();
         if (uploadedPublicId) {
-          finalVideoId = uploadedPublicId; // e.g., "workouts/hiit"
+          finalVideoId = uploadedPublicId; 
         }
       }
 
-      // 2) Prepare payload to API
+      
       const payload = {
         ...formData,
-        video_url: finalVideoId, // can be manual input or uploaded public_id
+        video_url: finalVideoId,
       };
 
       const res = await fetch('/api/workouts', {
@@ -155,7 +152,7 @@ const WorkoutForm = ({ onCreated }) => {
         <div className="grid sm:grid-cols-2 gap-3">
           <input
             name="video_url"
-            placeholder="Video public_id or full URL (optional)"
+            placeholder="full URL"
             value={formData.video_url}
             onChange={handleChange}
             className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
@@ -167,9 +164,6 @@ const WorkoutForm = ({ onCreated }) => {
             className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
           />
         </div>
-        <p className="text-xs text-gray-500 -mt-2">
-          Tip: leave the text field empty and upload a video file, or paste your Cloudinary public_id (e.g. <code>{WORKOUTS_FOLDER}/squats-level1</code>) or full URL.
-        </p>
       </div>
 
       <button
@@ -177,7 +171,7 @@ const WorkoutForm = ({ onCreated }) => {
         disabled={loading}
         className="mt-4 inline-flex items-center justify-center rounded-lg bg-orange-500 px-5 py-2.5 font-semibold text-white shadow-md transition hover:bg-orange-600 disabled:opacity-70 disabled:cursor-not-allowed"
       >
-        {loading ? 'Submitting...' : 'Add Workout'}
+        {loading ? 'Submitting...' : 'Add'}
       </button>
 
       {message && (

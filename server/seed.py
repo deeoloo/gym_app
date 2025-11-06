@@ -47,34 +47,138 @@ def seed_users(num_users=5):
 
     db.session.commit()
     return users
-
-
-def seed_workouts(users, num_workouts=8):
+def seed_workouts(users):
     """Seed workouts for users"""
     print("Seeding workouts...")
-    workout_types = [
-        "Strength Training", "Cardio", "HIIT", "Yoga",
-        "Pilates", "CrossFit", "Swimming", "Cycling"
-    ]
-    difficulties = ["Easy", "Moderate", "Hard", "Advanced"]
-    
-    for _ in range(num_workouts):
+
+    workouts = [
+    {
+        "name": "Full-body",
+        "video_url": "workouts/crossfit",
+        "description": "A balanced training routine that targets all major muscle groups—upper body, lower body, and core—using a mix of strength, cardio, and flexibility exercises to improve overall fitness and endurance.",
+        "difficulty": "Medium",
+        "duration": 45,  
+        "exercises": "Rope swing, Burpees, Push-ups, Squats, Deadlifts"
+    },
+    {
+        "name": "Yoga",
+        "video_url": "workouts/yoga",
+        "description": "A mindful practice designed to enhance flexibility, strength, and mental focus. This workout will work on your core, balance, and body alignment.",
+        "difficulty": "Hard",
+        "duration": 45,  
+        "exercises": "Downward Dog, Plank, Tree Pose, Warrior I, Child's Pose"
+    },
+    {
+        "name": "Back-workout",
+        "video_url": "workouts/katabox",
+        "description": "Focuses on strengthening the back muscles while incorporating high-intensity cardio exercises to burn fat and improve endurance.",
+        "difficulty": "Advanced",
+        "duration": 30,  
+        "exercises": "Jump Squats, Burpees, Sprints, Push-ups, Deadlifts, Bent-over Rows"
+    },
+    {
+        "name": "Pilates",
+        "video_url": "workouts/pilates",
+        "description": "A low-impact exercise that focuses on core strength, flexibility, and total body alignment. The exercises promote long, lean muscle development.",
+        "difficulty": "Advanced",
+        "duration": 45,  
+        "exercises": "Roll-ups, Leg Circles, Plank, Swimming, Teaser"
+    },
+    {
+        "name": "Cycling",
+        "video_url": "workouts/cycling",
+        "description": "An intense cardio workout designed to improve cardiovascular health and burn fat. This routine involves interval training on a stationary bike to maximize calorie burn.",
+        "difficulty": "Advanced",
+        "duration": 30,  
+        "exercises": "High-intensity intervals, Sprint intervals, Hill climbs, Recovery pedaling"
+    }
+]
+
+
+    for item in workouts:
         user = random.choice(users)
         workout = Workout(
-            video_url=fake.url(),
-            name=f"{random.choice(workout_types)} Session",
-            description=fake.sentence(),
-            difficulty=random.choice(difficulties),
-            duration=random.randint(15, 120),
-            exercises=", ".join(fake.words(nb=random.randint(3, 6))),  # Simulate a list of exercises
-            created_at=fake.date_time_between(
-                start_date=user.created_at,
-                end_date='now'
-            ),
+            video_url=item["video_url"],
+            name=item["name"],
+            description=item["description"],
+            difficulty=item["difficulty"],
+            duration=item["duration"],
+            exercises=item["exercises"],
+            created_at=fake.date_time_between(start_date=user.created_at, end_date='now'),
             user_id=user.id
         )
         db.session.add(workout)
     db.session.commit()
+
+
+def seed_nutrition_plans(users):
+    """Seed nutrition plans"""
+    print("Seeding nutrition plans...")
+
+    plans = [
+        {
+            "name": "Vegetable",
+            "image_url": "nutrition/stir_fried_vegetable",
+            "description": "Balanced vegetable perfect for muscle recovery.",
+            "calories": 450,
+            "protein": 42,
+            "carbs": 38,
+            "fats": 12
+        },
+        {
+            "name": "Smoothie",
+            "image_url": "nutrition/smoothie",
+            "description": "A smoothie made of carbs and fiber to fuel your morning.",
+            "calories": 320,
+            "protein": 18,
+            "carbs": 45,
+            "fats": 8
+        },
+        {
+            "name": "Cereal Bowl",
+            "image_url": "nutrition/cereal",
+            "description": "Flakes and granola mixed with yoghurt and berries, with drizzed honey for natural sweetness.",
+            "calories": 250,
+            "protein": 10,
+            "carbs": 30,
+            "fats": 9
+        },
+        {
+            "name": "Chicken Bowl",
+            "image_url": "nutrition/chicken_rice",
+            "description": "High-protein, balanced meal perfect for muscle recovery.",
+            "calories": 450,
+            "protein": 42,
+            "carbs": 38,
+            "fats": 12
+        },
+        {
+            "name": "Salmon dish",
+            "image_url": "nutrition/salmon",
+            "description": "Freshly grilled salmon rich in high-protein, balanced with a bowl of vegetable.",
+            "calories": 450,
+            "protein": 42,
+            "carbs": 38,
+            "fats": 12
+        }
+    ]
+
+    for item in plans:
+        user = random.choice(users)
+        plan = NutritionPlan(
+            name=item["name"],
+            image_url=item["image_url"],
+            description=item["description"],
+            calories=item["calories"],
+            protein=item["protein"],
+            carbs=item["carbs"],
+            fats=item["fats"],
+            created_at=fake.date_time_between(start_date=user.created_at, end_date='now'),
+            user_id=user.id
+        )
+        db.session.add(plan)
+    db.session.commit()
+
 
 
 def seed_challenges(num_challenges=5):
@@ -175,27 +279,6 @@ def seed_friendships(users):
                 )
     db.session.commit()
 
-def seed_nutrition_plans(users, num_plans=50):
-    """Seed nutrition plans"""
-    print("Seeding nutrition plans...")
-    for _ in range(num_plans):
-        user = random.choice(users)
-        plan = NutritionPlan(
-            name=f"{random.choice(['Lean', 'Bulk', 'Keto', 'Vegan'])} {random.choice(['Meal', 'Plan', 'Nutrition'])}",
-            image_url=fake.image_url(),
-            description=fake.paragraph(),
-            calories=random.randint(1200, 3000),
-            protein=random.randint(50, 200),
-            carbs=random.randint(50, 400),
-            fats=random.randint(20, 150),
-            created_at=fake.date_time_between(
-                start_date=user.created_at,
-                end_date='now'
-            ),
-            user_id=user.id
-        )
-        db.session.add(plan)
-    db.session.commit()
 
 def seed_products():
     """Seed fitness products using real images"""

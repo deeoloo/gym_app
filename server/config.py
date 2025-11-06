@@ -11,6 +11,9 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=5)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(weeks=5)
     JWT_HEADER_TYPE = 'Bearer'
+    CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+    API_KEY = os.getenv("CLOUDINARY_API_KEY")
+    API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
 
     # CORS settings
     CORS_ORIGINS = ['http://localhost:5173']

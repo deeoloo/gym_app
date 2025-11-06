@@ -15,10 +15,9 @@ const NutritionForm = ({ onCreated }) => {
     protein: '',
     carbs: '',
     fats: '',
-    // NEW: allow manual public_id or URL
     image_url: '',
   });
-  const [imageFile, setImageFile] = useState(null); // NEW
+  const [imageFile, setImageFile] = useState(null); 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -32,7 +31,7 @@ const NutritionForm = ({ onCreated }) => {
     setImageFile(file);
   };
 
-  // Upload to Cloudinary if file selected; return public_id
+  
   const uploadImageIfNeeded = async () => {
     if (!imageFile) return null;
 
@@ -48,7 +47,7 @@ const NutritionForm = ({ onCreated }) => {
       throw new Error(`Cloudinary upload failed: ${res.status} ${errText}`);
     }
     const json = await res.json();
-    return json.public_id || null; // e.g. "nutrition/bowl-chicken-01"
+    return json.public_id || null;
   };
 
   const handleSubmit = async (e) => {
@@ -57,7 +56,7 @@ const NutritionForm = ({ onCreated }) => {
     setMessage('');
 
     try {
-      // 1) Upload image file if provided to get a public_id
+      
       let finalImageId = formData.image_url?.trim() || '';
       if (imageFile) {
         const uploadedPublicId = await uploadImageIfNeeded();
@@ -66,7 +65,7 @@ const NutritionForm = ({ onCreated }) => {
         }
       }
 
-      // 2) Submit to your API
+      
       const payload = { ...formData, image_url: finalImageId };
 
       const res = await fetch('/api/nutrition', {
@@ -164,11 +163,10 @@ const NutritionForm = ({ onCreated }) => {
           className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
         />
 
-        {/* NEW: Either paste a public_id/URL OR upload an image file */}
         <div className="grid sm:grid-cols-2 gap-3">
           <input
             name="image_url"
-            placeholder="Image public_id or full URL (optional)"
+            placeholder="full image URL"
             value={formData.image_url}
             onChange={handleChange}
             className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
@@ -180,10 +178,6 @@ const NutritionForm = ({ onCreated }) => {
             className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
           />
         </div>
-        <p className="text-xs text-gray-500 -mt-2">
-          Tip: leave the text field empty and upload an image, or paste your Cloudinary public_id
-          (e.g. <code>{NUTRITION_FOLDER}/bowl-chicken-01</code>) or full URL.
-        </p>
       </div>
 
       <button
@@ -191,7 +185,7 @@ const NutritionForm = ({ onCreated }) => {
         disabled={loading}
         className="mt-4 inline-flex items-center justify-center rounded-lg bg-orange-500 px-5 py-2.5 font-semibold text-white shadow-md transition hover:bg-orange-600 disabled:opacity-70 disabled:cursor-not-allowed"
       >
-        {loading ? 'Submitting...' : 'Add Nutrition Plan'}
+        {loading ? 'Submitting...' : 'Add'}
       </button>
 
       {message && (
