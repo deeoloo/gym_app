@@ -2,6 +2,10 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+const NUTRITION_FOLDER = import.meta.env.VITE_CLOUDINARY_NUTRITION_FOLDE;
+
 const NutritionForm = ({ onCreated }) => {
   const { token } = useContext(AuthContext);
   const [formData, setFormData] = useState({
@@ -11,7 +15,10 @@ const NutritionForm = ({ onCreated }) => {
     protein: '',
     carbs: '',
     fats: '',
+    // NEW: allow manual public_id or URL
+    image_url: '',
   });
+  const [imageFile, setImageFile] = useState(null); // NEW
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -20,19 +27,55 @@ const NutritionForm = ({ onCreated }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageFileChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    setImageFile(file);
+  };
+
+  // Upload to Cloudinary if file selected; return public_id
+  const uploadImageIfNeeded = async () => {
+    if (!imageFile) return null;
+
+    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+    const body = new FormData();
+    body.append('file', imageFile);
+    body.append('upload_preset', UPLOAD_PRESET);
+    body.append('folder', NUTRITION_FOLDER);
+
+    const res = await fetch(url, { method: 'POST', body });
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      throw new Error(`Cloudinary upload failed: ${res.status} ${errText}`);
+    }
+    const json = await res.json();
+    return json.public_id || null; // e.g. "nutrition/bowl-chicken-01"
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
 
     try {
+      // 1) Upload image file if provided to get a public_id
+      let finalImageId = formData.image_url?.trim() || '';
+      if (imageFile) {
+        const uploadedPublicId = await uploadImageIfNeeded();
+        if (uploadedPublicId) {
+          finalImageId = uploadedPublicId;
+        }
+      }
+
+      // 2) Submit to your API
+      const payload = { ...formData, image_url: finalImageId };
+
       const res = await fetch('/api/nutrition', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -45,13 +88,15 @@ const NutritionForm = ({ onCreated }) => {
           protein: '',
           carbs: '',
           fats: '',
+          image_url: '',
         });
+        setImageFile(null);
         onCreated?.();
       } else {
         setMessage(data.message || 'Error creating plan.');
       }
     } catch (err) {
-      setMessage('Something went wrong.');
+      setMessage(err.message || 'Something went wrong.');
     }
 
     setLoading(false);
@@ -118,6 +163,27 @@ const NutritionForm = ({ onCreated }) => {
           required
           className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
         />
+
+        {/* NEW: Either paste a public_id/URL OR upload an image file */}
+        <div className="grid sm:grid-cols-2 gap-3">
+          <input
+            name="image_url"
+            placeholder="Image public_id or full URL (optional)"
+            value={formData.image_url}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageFileChange}
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
+          />
+        </div>
+        <p className="text-xs text-gray-500 -mt-2">
+          Tip: leave the text field empty and upload an image, or paste your Cloudinary public_id
+          (e.g. <code>{NUTRITION_FOLDER}/bowl-chicken-01</code>) or full URL.
+        </p>
       </div>
 
       <button
