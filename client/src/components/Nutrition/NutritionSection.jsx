@@ -47,6 +47,40 @@ const NutritionSection = () => {
     }
   }, [token]);
 
+
+  const savedRecipe = (recipe) => {
+    fetch(`/api/nutrition/${recipe.id}/save`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        console.log('Save response:', res);
+        if (!res.ok) throw new Error('Save failed');
+        return res.json();
+      })
+      .then(() => {
+        console.log('Recipe saved, updating profile data');
+        setProfileData((prev) => ({
+          ...prev,
+          savedRecipes: [
+            ...prev.savedRecipes,
+            {
+              id: recipe.id,
+              name: recipe.name,
+              date: new Date().toISOString(),
+            },
+          ],
+        }));
+      })
+      .catch((err) => {
+        console.error('Error saving recipe:', err);
+        if (err.message.includes('token')) logout?.();
+      });
+  };
+
   const handleDeleteNutrition = async (id) => {
     if (!window.confirm('Delete this nutrition plan?')) return;
 
@@ -76,38 +110,6 @@ const NutritionSection = () => {
       console.error('Delete error:', err);
       alert('Error deleting nutrition');
     }
-  };
-
-  const savedRecipe = (recipe) => {
-    fetch(`/api/nutrition/${recipe.id}/save`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        console.log('Save response:', res);
-        if (!res.ok) throw new Error('Save failed');
-        return res.json();
-      })
-      .then(() => {
-        setProfileData((prev) => ({
-          ...prev,
-          savedRecipes: [
-            ...prev.savedRecipes,
-            {
-              id: recipe.id,
-              name: recipe.name,
-              date: new Date().toISOString(),
-            },
-          ],
-        }));
-      })
-      .catch((err) => {
-        console.error('Error saving recipe:', err);
-        if (err.message.includes('token')) logout?.();
-      });
   };
 
   const filteredPlans = nutritionData.filter(plan =>

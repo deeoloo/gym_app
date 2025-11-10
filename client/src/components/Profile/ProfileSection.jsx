@@ -103,7 +103,7 @@ const ProfileSection = ({ externalProfileData }) => {
 
        
         {/* Stats Section */}
-        <div className="w-screen bg-gray-50 py-6">
+        <div className="w-full bg-gray-50 py-6">
 <div className="max-w-6xl mx-auto px-4">
   <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">
     Your Stats
