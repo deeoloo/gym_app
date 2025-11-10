@@ -18,7 +18,7 @@ const ProfileSection = ({ externalProfileData }) => {
     }
   );
 
-  // ✅ MERGE (don't replace) so local updates aren't wiped by partial server payloads
+  // Update profileData when externalProfileData changes
   useEffect(() => {
     if (externalProfileData) {
       setProfileData(prev => ({ ...prev, ...externalProfileData }));

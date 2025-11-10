@@ -27,6 +27,7 @@ const Dashboard = () => {
 
         if (!res.ok) throw new Error('Invalid or expired token');
         const data = await res.json();
+        console.log('Fetched Profile Data:', data);
         setProfileData(data);
       } catch (err) {
         console.error('Error loading profile:', err);
@@ -51,13 +52,14 @@ const Dashboard = () => {
             Manage your fitness journey, track progress, and stay motivated every day.
           </p>
         </div>
-
+      <section className="mt-10">
         {/* Profile Section */}
         {loadingProfile ? (
           <p className="text-center text-gray-600 italic">Loading profile...</p>
         ) : (
           <ProfileSection externalProfileData={profileData} />
         )}
+      </section>
 
         {/* Quick Access */}
         <section className="mt-10">
