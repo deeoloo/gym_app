@@ -87,7 +87,7 @@ const ProfileSection = ({ externalProfileData }) => {
 
   return (
     <section className="min-h-screen bg-green-50 text-gray-800 items-start py-10 w-full">
-      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-md p-8">
+      <div className="bg-white w-full rounded-2xl shadow-md p-8">
         {/* Header */}
         <div className="flex items-center border-b border-gray-200 pb-6 mb-6">
           <div className="text-6xl mr-4 bg-green-100 text-green-600 rounded-full p-4">
@@ -103,7 +103,8 @@ const ProfileSection = ({ externalProfileData }) => {
 
        
         {/* Stats Section */}
-<div className="mb-10">
+        <div className="w-screen bg-gray-50 py-6">
+<div className="max-w-6xl mx-auto px-4">
   <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">
     Your Stats
   </h3>
@@ -131,6 +132,7 @@ const ProfileSection = ({ externalProfileData }) => {
         {profileData?.savedRecipes?.length || 0}
       </div>
       <div className="text-gray-700">Saved Recipes</div>
+    </div>
     </div>
   </div>
 </div>
