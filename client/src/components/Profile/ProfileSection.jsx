@@ -148,7 +148,7 @@ const ProfileSection = ({ externalProfileData }) => {
               recentActivities.map((activity, index) => (
                 <div
                   key={index}
-                  className="flex items-start bg-green-500 hover:bg-green-50 rounded-lg p-4 shadow-sm transition"
+                  className="flex items-start bg-green-500 rounded-lg p-4 shadow-sm transition"
                 >
                   <span className="text-3xl mr-3">{activity.icon}</span>
                   <div className="min-w-0">
@@ -164,44 +164,6 @@ const ProfileSection = ({ externalProfileData }) => {
             )}
           </div>
         </div>
-
-        {/* Achievements */}
-        {/*<div>
-          <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">
-            Achievements
-          </h3>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div
-              className={`rounded-xl p-6 text-center border-2 transition ${
-                (profileData?.completedWorkouts?.length || 0) >= 5
-                  ? 'border-green-600 bg-green-100 text-green-700'
-                  : 'border-gray-200 bg-white text-gray-700'
-              }`}
-            >
-              <div className="text-lg font-semibold mb-1">Workouts</div>
-              <div>
-                {(profileData?.completedWorkouts?.length || 0) >= 5
-                  ? 'Completed!'
-                  : `${Math.max(0, 5 - (profileData?.completedWorkouts?.length || 0))} to go`}
-              </div>
-            </div>
-
-            <div
-              className={`rounded-xl p-6 text-center border-2 transition ${
-                (profileData?.communityChallenges?.length || 0) >= 1
-                  ? 'border-orange-500 bg-orange-100 text-orange-700'
-                  : 'border-gray-200 bg-white text-gray-700'
-              }`}
-            >
-              <div className="text-lg font-semibold mb-1">Challenge</div>
-              <div>
-                {(profileData?.communityChallenges?.length || 0) >= 1
-                  ? 'Completed!'
-                  : 'Not started'}
-              </div>
-            </div>
-          </div>
-        </div>*/}
       </div>
     </section>
   );
