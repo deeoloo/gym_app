@@ -142,7 +142,7 @@ const renderNutritionCard = ({ data, onAction, isCompleted }) => (
           className="w-full h-48 object-cover"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = fallbackImage; // uses your existing fallback if defined globally
+            e.target.src = fallbackImage;
           }}
         />
       ) : (
@@ -169,10 +169,6 @@ const renderNutritionCard = ({ data, onAction, isCompleted }) => (
           </ul>
         </div>
 
-        <p className="text-gray-700">
-          <strong className="font-semibold text-gray-800">Colors:</strong>{' '}
-        </p>
-
         <div className="mt-2">
           <button
             onClick={onAction}
@@ -181,7 +177,7 @@ const renderNutritionCard = ({ data, onAction, isCompleted }) => (
               isCompleted ? 'bg-green-600 text-white' : 'bg-orange-500 text-white hover:bg-orange-600'
             }`}
           >
-            {isCompleted ? 'Added ✓' : 'Add to Cart'}
+            {isCompleted ? 'Added' : 'Add to Cart'}
           </button>
         </div>
       </div>
