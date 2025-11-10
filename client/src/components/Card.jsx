@@ -171,7 +171,6 @@ const renderNutritionCard = ({ data, onAction, isCompleted }) => (
 
         <p className="text-gray-700">
           <strong className="font-semibold text-gray-800">Colors:</strong>{' '}
-          {data.colors?.split(',').join(', ') || 'N/A'}
         </p>
 
         <div className="mt-2">
@@ -182,7 +181,7 @@ const renderNutritionCard = ({ data, onAction, isCompleted }) => (
               isCompleted ? 'bg-green-600 text-white' : 'bg-orange-500 text-white hover:bg-orange-600'
             }`}
           >
-            {isCompleted ? 'In Cart ✓' : 'Add to Cart'}
+            {isCompleted ? 'Added ✓' : 'Add to Cart'}
           </button>
         </div>
       </div>

@@ -75,6 +75,7 @@ const NutritionSection = () => {
           ],
         }));
       })
+      
       .catch((err) => {
         console.error('Error saving recipe:', err);
         if (err.message.includes('token')) logout?.();
@@ -158,7 +159,7 @@ const NutritionSection = () => {
               key={plan.id}
               type="nutrition"
               data={plan}
-              isCompleted={profileData.savedRecipes.some(r => r.id === plan.id)}
+              isCompleted={profileData.savedRecipes.includes(plan.id)}
               onAction={() => savedRecipe(plan)}
               onDelete={user?.id === plan.user?.id ? handleDeleteNutrition : undefined}
               currentUser={user}
