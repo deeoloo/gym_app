@@ -56,6 +56,7 @@ const WorkoutsSection = () => {
 
   const completeWorkout = (workout) => {
     if (!profileData.completedWorkouts.includes(workout.id)) {
+      console.log('Completing workout:', workout);
       setProfileData((prev) => {
         const updated = {
           ...prev,

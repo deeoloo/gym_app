@@ -87,6 +87,7 @@ const NutritionSection = () => {
       },
     })
       .then((res) => {
+        console.log('Save response:', res);
         if (!res.ok) throw new Error('Save failed');
         return res.json();
       })

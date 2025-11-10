@@ -101,33 +101,40 @@ const ProfileSection = ({ externalProfileData }) => {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-10">
-          <div className="bg-green-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
-            <div className="text-2xl font-bold text-green-700">
-              {profileData?.completedWorkouts?.length || 0}
-            </div>
-            <div className="text-gray-700">Workouts</div>
-          </div>
-          <div className="bg-blue-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
-            <div className="text-2xl font-bold text-blue-700">
-              {profileData?.communityChallenges?.length || 0}
-            </div>
-            <div className="text-gray-700">Challenges</div>
-          </div>
-          <div className="bg-purple-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
-            <div className="text-2xl font-bold text-purple-700">
-              {profileData?.friends?.length || 0}
-            </div>
-            <div className="text-gray-700">Friends</div>
-          </div>
-          <div className="bg-yellow-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
-            <div className="text-2xl font-bold text-yellow-700">
-              {profileData?.savedRecipes?.length || 0}
-            </div>
-            <div className="text-gray-700">Nutrition</div>
-          </div>
-        </div>
+       
+        {/* Stats Section */}
+<div className="mb-10">
+  <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">
+    Your Stats
+  </h3>
+  <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+    <div className="bg-green-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
+      <div className="text-2xl font-bold text-green-700">
+        {profileData?.completedWorkouts?.length || 0}
+      </div>
+      <div className="text-gray-700">Workouts Completed</div>
+    </div>
+    <div className="bg-blue-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
+      <div className="text-2xl font-bold text-blue-700">
+        {profileData?.communityChallenges?.length || 0}
+      </div>
+      <div className="text-gray-700">Challenges Joined</div>
+    </div>
+    <div className="bg-purple-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
+      <div className="text-2xl font-bold text-purple-700">
+        {profileData?.friends?.length || 0}
+      </div>
+      <div className="text-gray-700">Friends</div>
+    </div>
+    <div className="bg-yellow-50 rounded-xl py-4 px-2 text-center shadow-sm hover:shadow-md transition">
+      <div className="text-2xl font-bold text-yellow-700">
+        {profileData?.savedRecipes?.length || 0}
+      </div>
+      <div className="text-gray-700">Saved Recipes</div>
+    </div>
+  </div>
+</div>
+
 
         {/* Activity */}
         <div className="mb-10">
@@ -157,7 +164,7 @@ const ProfileSection = ({ externalProfileData }) => {
         </div>
 
         {/* Achievements */}
-        <div>
+        {/*<div>
           <h3 className="text-xl font-semibold text-green-800 mb-4 border-b border-gray-200 pb-2">
             Achievements
           </h3>
@@ -192,7 +199,7 @@ const ProfileSection = ({ externalProfileData }) => {
               </div>
             </div>
           </div>
-        </div>
+        </div>*/}
       </div>
     </section>
   );
