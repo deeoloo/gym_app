@@ -46,7 +46,7 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <div className="text-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-green-800 tracking-tight">
-            Welcome to GymHum Dashboard 💪
+            Welcome to GymHum Dashboard
           </h1>
           <p className="mt-3 text-green-700 max-w-2xl mx-auto">
             Manage your fitness journey, track progress, and stay motivated every day.
@@ -64,7 +64,7 @@ const Dashboard = () => {
         {/* Quick Access */}
         <section className="mt-10">
           <h2 className="text-xl sm:text-2xl font-bold text-green-800 mb-4">
-            🏁 Quick Access
+             Quick Access
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -72,7 +72,7 @@ const Dashboard = () => {
               className="cursor-pointer bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition duration-300 hover:bg-orange-50 hover:-translate-y-0.5 border-l-4 border-orange-400"
               onClick={() => navigate('/workouts')}
             >
-              <h3 className="text-lg font-bold text-green-800">🏋️ Workouts</h3>
+              <h3 className="text-lg font-bold text-green-800"> Workouts</h3>
               <p className="text-gray-700 text-sm mt-2">
                 Explore your personalized training routines
               </p>
@@ -82,7 +82,7 @@ const Dashboard = () => {
               className="cursor-pointer bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition duration-300 hover:bg-orange-50 hover:-translate-y-0.5 border-l-4 border-orange-400"
               onClick={() => navigate('/nutrition')}
             >
-              <h3 className="text-lg font-bold text-green-800">🥗 Nutrition</h3>
+              <h3 className="text-lg font-bold text-green-800"> Nutrition</h3>
               <p className="text-gray-700 text-sm mt-2">
                 View suggested meal plans and diets
               </p>
@@ -92,7 +92,7 @@ const Dashboard = () => {
               className="cursor-pointer bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition duration-300 hover:bg-orange-50 hover:-translate-y-0.5 border-l-4 border-orange-400"
               onClick={() => navigate('/products')}
             >
-              <h3 className="text-lg font-bold text-green-800">🛍️ Products</h3>
+              <h3 className="text-lg font-bold text-green-800"> Products</h3>
               <p className="text-gray-700 text-sm mt-2">
                 Buy equipment and supplements
               </p>
@@ -102,7 +102,7 @@ const Dashboard = () => {
               className="cursor-pointer bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition duration-300 hover:bg-orange-50 hover:-translate-y-0.5 border-l-4 border-orange-400"
               onClick={() => navigate('/community')}
             >
-              <h3 className="text-lg font-bold text-green-800">💬 Community</h3>
+              <h3 className="text-lg font-bold text-green-800"> Community</h3>
               <p className="text-gray-700 text-sm mt-2">
                 Connect and share your journey
               </p>

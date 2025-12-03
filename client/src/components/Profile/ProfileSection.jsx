@@ -14,7 +14,7 @@ const ProfileSection = ({ externalProfileData }) => {
       savedRecipes: [],
       username: user?.username || '',
       email: user?.email || '',
-      avatar: user?.avatar || '👤',
+      avatar: user?.avatar,
     }
   );
 
@@ -49,38 +49,33 @@ const ProfileSection = ({ externalProfileData }) => {
   const displayUser = {
     username: profileData?.username || '',
     email: profileData?.email || '',
-    avatar: profileData?.avatar || '👤',
+    avatar: profileData?.avatar,
   };
 
   const recentActivities = [
     ...(profileData?.completedWorkoutDetails || []).slice(-1).map((workout) => ({
       type: 'workout',
       text: `Completed ${workout.name}`,
-      icon: '🏋️',
       date: workout.date,
     })),
     ...(profileData?.communityChallenges || []).slice(-1).map((challenge) => ({
       type: 'challenge',
       text: `Joined ${challenge.name}`,
-      icon: '🏆',
       date: challenge.joined_at || new Date().toISOString(),
     })),
     ...(profileData?.savedRecipes || []).slice(-1).map((nutrition) => ({
       type: 'nutrition',
       text: `Saved ${nutrition.name}`,
-      icon: '🥗',
       date: nutrition.date,
     })),
     ...(profileData?.posts || []).slice(-1).map((post) => ({
       type: 'post',
       text: `Posted: "${(post.content || '').substring(0, 20)}..."`,
-      icon: '💬',
       date: post.time,
     })),
     ...(profileData?.friends || []).slice(-1).map((friend) => ({
       type: 'friends',
       text: `Became friends with ${friend.username}`,
-      icon: '🧑‍🤝‍🧑',
       date: friend.created_at || new Date().toISOString(),
     })),
   ].sort((a, b) => new Date(b.date) - new Date(a.date));
